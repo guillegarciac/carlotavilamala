@@ -36,32 +36,30 @@ export default async function LocaleLayout({ children, params: { locale } }) {
 }
 
 export function generateMetadata({ params: { locale } }) {
-  const url = 'https://carlotavilamala.vercel.app';
+  const baseUrl = 'https://carlotavilamala.vercel.app';
+  const url = `${baseUrl}/${locale}`;
 
   return {
     title: "Carlota Vilamala",
-    description: "Portfolio & Works",
-    metadataBase: new URL(url),
+    description: "Fashion Stylist & Creative Direction",
+    metadataBase: new URL(baseUrl),
     openGraph: {
       title: 'Carlota Vilamala',
       description: 'Fashion Stylist & Creative Direction',
       url: url,
-      siteName: 'Carlota Vilamala',
+      type: 'website',
       images: [
         {
           url: '/og-image.jpg',
-          width: 1200,
-          height: 630,
-          alt: 'Carlota Vilamala - Fashion Stylist & Creative Direction',
         },
       ],
-      locale: locale,
-      type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
+      domain: 'carlotavilamala.vercel.app',
       title: 'Carlota Vilamala',
       description: 'Fashion Stylist & Creative Direction',
+      url: url,
       images: ['/og-image.jpg'],
     },
   };
