@@ -1,0 +1,101 @@
+{
+  "navigation": {
+    "overview": "OVERVIEW",
+    "about": "ABOUT ME",
+    "contact": "CONTACT"
+  },
+  "about": {
+    "title": "BIO",
+    "bio": "I love fashion, it's part of my life. Fashion is design but fashion is also communication. It must reach all audiences, so you need to understand it and know how to explain it. That's why I have studied fashion events management, protocol, institutional relations, communication, and marketing.",
+    "bio2": "Stylist is my next goal. I have worked in London and Barcelona, two cities that have inspired me because fashion is everywhere. I like to create stories around fashion, as big brands do by creating storytelling that they know how to convey in their shows. For now I admire them, my dream is to get to do it myself someday.",
+    "clients": {
+      "title": "CLIENTS",
+      "list": {
+        "zara": "Zara",
+        "mango": "Mango",
+        "massimo": "Massimo Dutti",
+        "pullbear": "Pull&Bear",
+        "desigual": "Desigual",
+        "tous": "Tous",
+        "santaeulalia": "Santa Eulalia",
+        "bcnfashion": "080 Barcelona Fashion"
+      }
+    },
+    "expertise": {
+      "title": "EXPERTISE",
+      "list": {
+        "events": "Fashion Events Management",
+        "protocol": "Protocol & Institutional Relations",
+        "communication": "Fashion Communication",
+        "marketing": "Marketing Strategy",
+        "styling": "Fashion Styling",
+        "storytelling": "Visual Storytelling"
+      }
+    }
+  },
+  "contact": {
+    "title": "INQUIRE WITHIN",
+    "form": {
+      "name": "Name",
+      "email": "Email address",
+      "message": "Message",
+      "send": "SEND!",
+      "sending": "SENDING..."
+    },
+    "toast": {
+      "loading": "Sending message...",
+      "success": "Message sent successfully! Thank you for reaching out.",
+      "error": "Failed to send message. Please try again."
+    }
+  },
+  "language": {
+    "en": "English",
+    "es": "Spanish",
+    "ca": "Catalan"
+  },
+  "projects": {
+    "1": {
+      "title": "INFLUENCE",
+      "description": "The forces that shape you"
+    },
+    "2": {
+      "title": "ELEGANCE",
+      "description": "The art of refined simplicity"
+    },
+    "3": {
+      "title": "AUTHENTICITY",
+      "description": "True to your essence"
+    },
+    "4": {
+      "title": "INNOVATION",
+      "description": "Breaking boundaries in design"
+    },
+    "5": {
+      "title": "HERITAGE",
+      "description": "Timeless traditions reimagined"
+    },
+    "6": {
+      "title": "EXPRESSION",
+      "description": "Your style, your story"
+    },
+    "7": {
+      "title": "IDENTITY",
+      "description": "Fashion as self-discovery"
+    },
+    "8": {
+      "title": "ARTISTRY",
+      "description": "Where craft meets vision"
+    },
+    "9": {
+      "title": "EVOLUTION",
+      "description": "Constant transformation"
+    },
+    "10": {
+      "title": "HARMONY",
+      "description": "Balance in motion"
+    }
+  },
+  "footer": {
+    "rights": "All rights reserved"
+  }
+} 

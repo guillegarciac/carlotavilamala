@@ -1,0 +1,101 @@
+{
+  "navigation": {
+    "overview": "INICI",
+    "about": "SOBRE MI",
+    "contact": "CONTACTE"
+  },
+  "about": {
+    "title": "BIO",
+    "bio": "M'agrada la moda, és part de la meva vida. La moda és disseny però la moda també és comunicació. Ha d'arribar a tots els públics, per això necessites entendre-la i saber explicar-la. Per això he estudiat gestió d'esdeveniments de moda, protocol, relacions institucionals, comunicació i màrqueting.",
+    "bio2": "Estilista és el meu proper objectiu. He treballat a Londres i Barcelona, dues ciutats que m'han inspirat perquè la moda és a tot arreu. M'agrada crear històries al voltant de la moda, com fan les grans marques creant un storytelling que saben transmetre en els seus shows. Per ara els admiro, el meu somni és arribar a fer-ho jo mateixa algun dia.",
+    "clients": {
+      "title": "CLIENTS",
+      "list": {
+        "zara": "Zara",
+        "mango": "Mango",
+        "massimo": "Massimo Dutti",
+        "pullbear": "Pull&Bear",
+        "desigual": "Desigual",
+        "tous": "Tous",
+        "santaeulalia": "Santa Eulalia",
+        "bcnfashion": "080 Barcelona Fashion"
+      }
+    },
+    "expertise": {
+      "title": "EXPERIÈNCIA",
+      "list": {
+        "events": "Gestió d'Esdeveniments de Moda",
+        "protocol": "Protocol i Relacions Institucionals",
+        "communication": "Comunicació de Moda",
+        "marketing": "Estratègia de Màrqueting",
+        "styling": "Estilisme",
+        "storytelling": "Narrativa Visual"
+      }
+    }
+  },
+  "contact": {
+    "title": "CONTACTAR",
+    "form": {
+      "name": "Nom",
+      "email": "Correu electrònic",
+      "message": "Missatge",
+      "send": "ENVIAR!",
+      "sending": "ENVIANT..."
+    },
+    "toast": {
+      "loading": "Enviant missatge...",
+      "success": "Missatge enviat amb èxit! Gràcies per contactar.",
+      "error": "Error en enviar el missatge. Si us plau, torna-ho a provar."
+    }
+  },
+  "language": {
+    "en": "Anglès",
+    "es": "Espanyol",
+    "ca": "Català"
+  },
+  "projects": {
+    "1": {
+      "title": "INFLUÈNCIA",
+      "description": "Les forces que et modelen"
+    },
+    "2": {
+      "title": "ELEGÀNCIA",
+      "description": "L'art de la simplicitat refinada"
+    },
+    "3": {
+      "title": "AUTENTICITAT",
+      "description": "Fidel a la teva essència"
+    },
+    "4": {
+      "title": "INNOVACIÓ",
+      "description": "Trencant límits en disseny"
+    },
+    "5": {
+      "title": "HERÈNCIA",
+      "description": "Tradicions atemporals reimaginades"
+    },
+    "6": {
+      "title": "EXPRESSIÓ",
+      "description": "El teu estil, la teva història"
+    },
+    "7": {
+      "title": "IDENTITAT",
+      "description": "La moda com autodescobriment"
+    },
+    "8": {
+      "title": "ART",
+      "description": "On l'ofici troba la visió"
+    },
+    "9": {
+      "title": "EVOLUCIÓ",
+      "description": "Transformació constant"
+    },
+    "10": {
+      "title": "HARMONIA",
+      "description": "Equilibri en moviment"
+    }
+  },
+  "footer": {
+    "rights": "Tots els drets reservats"
+  }
+} 

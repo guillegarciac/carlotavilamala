@@ -1,0 +1,101 @@
+{
+  "navigation": {
+    "overview": "INICIO",
+    "about": "SOBRE MÍ",
+    "contact": "CONTACTO"
+  },
+  "about": {
+    "title": "BIO",
+    "bio": "Me gusta la moda, es parte de mi vida. La moda es diseño pero la moda también es comunicación. Debe llegar a todos los públicos, por lo que necesitas entenderla y saber explicarla. Por eso he estudiado gestión de eventos de moda, protocolo, relaciones institucionales, comunicación y marketing.",
+    "bio2": "Estilista es mi próximo objetivo. He trabajado en Londres y Barcelona, dos ciudades que me han inspirado porque la moda está en todas partes. Me gusta crear historias alrededor de la moda, como hacen las grandes marcas creando un storytelling que saben transmitir en sus shows. Por ahora los admiro, mi sueño es llegar a hacerlo yo misma algún día.",
+    "clients": {
+      "title": "CLIENTES",
+      "list": {
+        "zara": "Zara",
+        "mango": "Mango",
+        "massimo": "Massimo Dutti",
+        "pullbear": "Pull&Bear",
+        "desigual": "Desigual",
+        "tous": "Tous",
+        "santaeulalia": "Santa Eulalia",
+        "bcnfashion": "080 Barcelona Fashion"
+      }
+    },
+    "expertise": {
+      "title": "EXPERIENCIA",
+      "list": {
+        "events": "Gestión de Eventos de Moda",
+        "protocol": "Protocolo y Relaciones Institucionales",
+        "communication": "Comunicación de Moda",
+        "marketing": "Estrategia de Marketing",
+        "styling": "Estilismo",
+        "storytelling": "Narrativa Visual"
+      }
+    }
+  },
+  "contact": {
+    "title": "CONTACTAR",
+    "form": {
+      "name": "Nombre",
+      "email": "Correo electrónico",
+      "message": "Mensaje",
+      "send": "ENVIAR!",
+      "sending": "ENVIANDO..."
+    },
+    "toast": {
+      "loading": "Enviando mensaje...",
+      "success": "¡Mensaje enviado con éxito! Gracias por contactar.",
+      "error": "Error al enviar el mensaje. Por favor, inténtalo de nuevo."
+    }
+  },
+  "language": {
+    "en": "Inglés",
+    "es": "Español",
+    "ca": "Catalán"
+  },
+  "projects": {
+    "1": {
+      "title": "INFLUENCIA",
+      "description": "Las fuerzas que te moldean"
+    },
+    "2": {
+      "title": "ELEGANCIA",
+      "description": "El arte de la simplicidad refinada"
+    },
+    "3": {
+      "title": "AUTENTICIDAD",
+      "description": "Fiel a tu esencia"
+    },
+    "4": {
+      "title": "INNOVACIÓN",
+      "description": "Rompiendo límites en diseño"
+    },
+    "5": {
+      "title": "HERENCIA",
+      "description": "Tradiciones atemporales reimaginadas"
+    },
+    "6": {
+      "title": "EXPRESIÓN",
+      "description": "Tu estilo, tu historia"
+    },
+    "7": {
+      "title": "IDENTIDAD",
+      "description": "La moda como autodescubrimiento"
+    },
+    "8": {
+      "title": "ARTE",
+      "description": "Donde el oficio encuentra la visión"
+    },
+    "9": {
+      "title": "EVOLUCIÓN",
+      "description": "Transformación constante"
+    },
+    "10": {
+      "title": "ARMONÍA",
+      "description": "Equilibrio en movimiento"
+    }
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados"
+  }
+} 

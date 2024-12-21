@@ -16,4 +16,4 @@ body {
   .nav-link {
     @apply hover:opacity-50 transition-opacity;
   }
-} 
+}
