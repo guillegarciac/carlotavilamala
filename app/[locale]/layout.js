@@ -22,6 +22,11 @@ export default async function LocaleLayout({ children, params: { locale } }) {
 
   return (
     <html lang={locale}>
+      <head>
+        <link rel="icon" href="/favicon.ico" />
+        <title>Carlota Vilamala</title>
+        <meta name="description" content="Portfolio & Works" />
+      </head>
       <body className={`${playfair.className} antialiased min-h-screen flex flex-col`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
@@ -41,4 +46,4 @@ export function generateMetadata({ params: { locale } }) {
 
 export function generateStaticParams() {
   return ['en', 'es', 'ca'].map((locale) => ({ locale }));
-} 
+}
