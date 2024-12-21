@@ -24,18 +24,6 @@ export default async function LocaleLayout({ children, params: { locale } }) {
     <html lang={locale}>
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <title>Carlota Vilamala</title>
-        <meta name="description" content="Portfolio & Works" />
-        <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://carlotavilamala.vercel.app/" />
-        <meta property="og:title" content="Carlota Vilamala" />
-        <meta property="og:description" content="Fashion Stylist & Creative Direction" />
-        <meta property="og:image" content="https://carlotavilamala.vercel.app/og-image.jpg" />
-        <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="https://carlotavilamala.vercel.app/" />
-        <meta property="twitter:title" content="Carlota Vilamala" />
-        <meta property="twitter:description" content="Fashion Stylist & Creative Direction" />
-        <meta property="twitter:image" content="https://carlotavilamala.vercel.app/og-image.jpg" />
       </head>
       <body className={`${playfair.className} antialiased min-h-screen flex flex-col`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
@@ -48,9 +36,34 @@ export default async function LocaleLayout({ children, params: { locale } }) {
 }
 
 export function generateMetadata({ params: { locale } }) {
+  const url = 'https://carlotavilamala.vercel.app';
+
   return {
     title: "Carlota Vilamala",
     description: "Portfolio & Works",
+    metadataBase: new URL(url),
+    openGraph: {
+      title: 'Carlota Vilamala',
+      description: 'Fashion Stylist & Creative Direction',
+      url: url,
+      siteName: 'Carlota Vilamala',
+      images: [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: 'Carlota Vilamala - Fashion Stylist & Creative Direction',
+        },
+      ],
+      locale: locale,
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Carlota Vilamala',
+      description: 'Fashion Stylist & Creative Direction',
+      images: ['/og-image.jpg'],
+    },
   };
 }
 
