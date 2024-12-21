@@ -191,16 +191,18 @@ export default function ImageGallery({ projects }) {
             </div>
           </button>
 
-          {/* Previous Arrow + Title - Always show it now */}
-          <div className="absolute left-[5%] top-0 bottom-0 hidden md:flex items-center group z-[60]">
-            <div className="flex items-center gap-4 w-[15vw]">
+          {/* Previous Arrow + Title */}
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60]">
+            <div 
+              className="flex items-center gap-4 pl-8 cursor-pointer"
+              onClick={handlePrev}
+            >
               <button
-                className="w-12 h-12 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors shrink-0"
-                onClick={handlePrev}
+                className="w-12 h-12 flex items-center justify-center transition-transform shrink-0"
               >
                 <span className="text-3xl transform transition-transform hover:scale-150">←</span>
               </button>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <h3 className="text-sm font-medium tracking-wider mb-1 line-clamp-1">
                   {t(`${getAdjacentProject('prev').id}.title`)}
                 </h3>
@@ -211,10 +213,13 @@ export default function ImageGallery({ projects }) {
             </div>
           </div>
           
-          {/* Next Arrow + Title - Always show it now */}
-          <div className="absolute right-[5%] top-0 bottom-0 hidden md:flex items-center group z-[60]">
-            <div className="flex items-center gap-4 w-[15vw]">
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-right pointer-events-none">
+          {/* Next Arrow + Title */}
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60]">
+            <div 
+              className="flex items-center gap-4 pr-8 cursor-pointer"
+              onClick={handleNext}
+            >
+              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-right">
                 <h3 className="text-sm font-medium tracking-wider mb-1 line-clamp-1">
                   {t(`${getAdjacentProject('next').id}.title`)}
                 </h3>
@@ -223,8 +228,7 @@ export default function ImageGallery({ projects }) {
                 </p>
               </div>
               <button
-                className="w-12 h-12 flex items-center justify-center hover:bg-black/5 rounded-full transition-colors shrink-0"
-                onClick={handleNext}
+                className="w-12 h-12 flex items-center justify-center transition-transform shrink-0"
               >
                 <span className="text-3xl transform transition-transform hover:scale-150">→</span>
               </button>

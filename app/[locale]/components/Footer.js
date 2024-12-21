@@ -7,12 +7,15 @@ export default function Footer() {
 
   return (
     <footer className="py-8 bg-[#faf9f6] mt-auto">
-      <div className="max-w-screen-lg mx-auto flex justify-between items-center text-xs px-8">
-        <div className="absolute left-8">
-          © {new Date().getFullYear()} Carlota Vilamala
-        </div>
-        <div className="absolute right-8">
-          {t('rights')}
+      <div className="text-xs relative">
+        {/* Copyright and Rights */}
+        <div className="flex flex-col md:flex-row md:justify-between gap-2 md:gap-0">
+          <div className="text-center md:text-left md:absolute md:left-8">
+            © {new Date().getFullYear()} Carlota Vilamala
+          </div>
+          <div className="text-center md:text-right md:absolute md:right-8">
+            {t('rights')}
+          </div>
         </div>
       </div>
     </footer>
