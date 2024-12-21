@@ -7,6 +7,37 @@ import { useTranslations } from 'next-intl';
 export default function ImageGallery({ projects }) {
   const t = useTranslations('projects');
   const [selectedImage, setSelectedImage] = useState(null);
+  const [focusedImage, setFocusedImage] = useState(null);
+
+  // Create refs for each project
+  const projectRefs = useRef(new Map());
+
+  useEffect(() => {
+    // Only run on mobile devices
+    if (window.innerWidth >= 768) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            setFocusedImage(Number(entry.target.dataset.projectId));
+          }
+        });
+      },
+      {
+        threshold: 0.7, // 70% of the item must be visible
+        rootMargin: '-20% 0px' // Adds a margin to trigger slightly before/after the item is fully visible
+      }
+    );
+
+    // Observe all project elements
+    projectRefs.current.forEach((ref) => {
+      if (ref) observer.observe(ref);
+    });
+
+    return () => observer.disconnect();
+  }, []);
+
   const touchStart = useRef(null);
   const touchEnd = useRef(null);
 
@@ -99,6 +130,8 @@ export default function ImageGallery({ projects }) {
         {projects.map((project) => (
           <div
             key={project.id}
+            ref={(el) => projectRefs.current.set(project.id, el)}
+            data-project-id={project.id}
             className="group cursor-pointer"
             onClick={() => setSelectedImage(project)}
           >
@@ -115,12 +148,21 @@ export default function ImageGallery({ projects }) {
                 priority={project.id <= 4}
                 quality={95}
               />
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300">
-                <div className="absolute inset-0 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-white text-center p-4">
-                  <h3 className="text-lg font-medium tracking-wider mb-2 transform group-hover:scale-100 scale-150 transition-transform duration-300">
+              <div 
+                className={`absolute inset-0 transition-colors duration-300
+                  md:bg-black/0 md:group-hover:bg-black/40
+                  ${focusedImage === project.id ? 'bg-black/40' : 'bg-black/0'}`}
+              >
+                <div 
+                  className={`absolute inset-0 flex flex-col items-center justify-center 
+                    transition-opacity duration-300 text-white text-center p-4
+                    md:opacity-0 md:group-hover:opacity-100
+                    ${focusedImage === project.id ? 'opacity-100' : 'opacity-0'}`}
+                >
+                  <h3 className="text-lg font-medium tracking-wider mb-2 transform transition-transform duration-300">
                     {t(`${project.id}.title`)}
                   </h3>
-                  <p className="text-sm font-light transform group-hover:scale-100 scale-150 transition-transform duration-300">
+                  <p className="text-sm font-light transform transition-transform duration-300">
                     {t(`${project.id}.description`)}
                   </p>
                 </div>
