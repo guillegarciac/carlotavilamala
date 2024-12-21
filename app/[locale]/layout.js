@@ -37,7 +37,9 @@ export default async function LocaleLayout({ children, params: { locale } }) {
 
 export function generateMetadata({ params: { locale } }) {
   const baseUrl = 'https://carlotavilamala.vercel.app';
-  const url = `${baseUrl}/${locale}`;
+  const timestamp = Date.now();
+  const url = `${baseUrl}/${locale}?v=${timestamp}`;
+  const imageUrl = `/og-image.jpg?v=${timestamp}`;
 
   return {
     title: "Carlota Vilamala",
@@ -50,7 +52,7 @@ export function generateMetadata({ params: { locale } }) {
       type: 'website',
       images: [
         {
-          url: '/og-image.jpg',
+          url: imageUrl,
         },
       ],
     },
@@ -60,7 +62,7 @@ export function generateMetadata({ params: { locale } }) {
       title: 'Carlota Vilamala',
       description: 'Fashion Stylist & Creative Direction',
       url: url,
-      images: ['/og-image.jpg'],
+      images: [imageUrl],
     },
   };
 }
