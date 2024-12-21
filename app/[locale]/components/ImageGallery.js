@@ -69,29 +69,35 @@ export default function ImageGallery({ projects }) {
 
   const handleKeyDown = useCallback((e) => {
     if (!selectedImage) return;
-
-    if (e.key === 'Escape') {
-      setSelectedImage(null);
-    } else if (e.key === 'ArrowRight') {
-      navigateToNext();
-    } else if (e.key === 'ArrowLeft') {
-      navigateToPrev();
+    
+    switch (e.key) {
+      case 'ArrowRight':
+        navigateToNext();
+        break;
+      case 'ArrowLeft':
+        navigateToPrev();
+        break;
+      case 'Escape':
+        setSelectedImage(null);
+        break;
     }
   }, [selectedImage]);
 
-  const navigateToNext = () => {
+  const navigateToNext = useCallback(() => {
     if (!selectedImage) return;
     const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
-    const nextIndex = currentIndex === projects.length - 1 ? 0 : currentIndex + 1;
+    if (currentIndex === -1) return;
+    const nextIndex = (currentIndex + 1) % projects.length;
     setSelectedImage(projects[nextIndex]);
-  };
+  }, [selectedImage, projects]);
 
-  const navigateToPrev = () => {
+  const navigateToPrev = useCallback(() => {
     if (!selectedImage) return;
     const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+    if (currentIndex === -1) return;
     const prevIndex = currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
     setSelectedImage(projects[prevIndex]);
-  };
+  }, [selectedImage, projects]);
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
@@ -115,14 +121,15 @@ export default function ImageGallery({ projects }) {
   };
 
   // Helper function to get next/prev project
-  const getAdjacentProject = (direction) => {
+  const getAdjacentProject = useCallback((direction) => {
     const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+    if (currentIndex === -1) return projects[0];
     if (direction === 'next') {
-      return projects[currentIndex === projects.length - 1 ? 0 : currentIndex + 1];
+      return projects[(currentIndex + 1) % projects.length];
     } else {
       return projects[currentIndex === 0 ? projects.length - 1 : currentIndex - 1];
     }
-  };
+  }, [selectedImage, projects]);
 
   return (
     <>
@@ -192,51 +199,53 @@ export default function ImageGallery({ projects }) {
           </button>
 
           {/* Previous Arrow + Title */}
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60]">
+          <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
             <div 
-              className="flex items-center gap-4 pl-8 cursor-pointer"
+              className="relative pl-6 cursor-pointer w-full"
               onClick={handlePrev}
             >
               <button
-                className="w-12 h-12 flex items-center justify-center transition-transform shrink-0"
+                className="w-10 h-10 flex items-center justify-center transition-all duration-300 absolute top-1/2 -translate-y-1/2 group-hover:opacity-0"
               >
-                <span className="text-3xl transform transition-transform hover:scale-150">←</span>
+                <span className="text-3xl">←</span>
               </button>
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <h3 className="text-sm font-medium tracking-wider mb-1 line-clamp-1">
+              <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 w-[180px]">
+                <h3 className="text-xs font-medium tracking-wider mb-1">
                   {t(`${getAdjacentProject('prev').id}.title`)}
                 </h3>
-                <p className="text-xs font-light line-clamp-2">
+                <p className="text-[11px] font-light">
                   {t(`${getAdjacentProject('prev').id}.description`)}
                 </p>
+                <span className="text-lg block mt-2">←</span>
               </div>
             </div>
           </div>
           
           {/* Next Arrow + Title */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60]">
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
             <div 
-              className="flex items-center gap-4 pr-8 cursor-pointer"
+              className="relative pr-6 cursor-pointer w-full"
               onClick={handleNext}
             >
-              <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-right">
-                <h3 className="text-sm font-medium tracking-wider mb-1 line-clamp-1">
+              <button
+                className="w-10 h-10 flex items-center justify-center transition-all duration-300 absolute top-1/2 -translate-y-1/2 right-6 group-hover:opacity-0"
+              >
+                <span className="text-3xl">→</span>
+              </button>
+              <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 text-right w-[180px]">
+                <h3 className="text-xs font-medium tracking-wider mb-1">
                   {t(`${getAdjacentProject('next').id}.title`)}
                 </h3>
-                <p className="text-xs font-light line-clamp-2">
+                <p className="text-[11px] font-light">
                   {t(`${getAdjacentProject('next').id}.description`)}
                 </p>
+                <span className="text-lg block mt-2">→</span>
               </div>
-              <button
-                className="w-12 h-12 flex items-center justify-center transition-transform shrink-0"
-              >
-                <span className="text-3xl transform transition-transform hover:scale-150">→</span>
-              </button>
             </div>
           </div>
 
           <div 
-            className="relative w-full h-full md:p-8"
+            className="relative w-full h-full md:px-40 md:py-8"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
@@ -244,10 +253,19 @@ export default function ImageGallery({ projects }) {
               alt={t(`${selectedImage.id}.title`)}
               fill
               sizes="100vw"
-              className="object-contain"
+              className="object-contain mx-auto !p-8 md:!p-16"
               priority
               quality={100}
             />
+            {/* Project Info - Desktop Only */}
+            <div className="hidden md:block absolute bottom-8 right-8 text-right max-w-[300px] bg-[#faf9f6]/80 p-4">
+              <h3 className="text-sm font-medium tracking-wider mb-1 whitespace-nowrap">
+                {t(`${selectedImage.id}.title`)}
+              </h3>
+              <p className="text-xs font-light whitespace-nowrap">
+                {t(`${selectedImage.id}.description`)}
+              </p>
+            </div>
           </div>
         </div>
       )}

@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "overview": "OVERVIEW",
+    "projects": "PROJECTS",
     "about": "ABOUT ME",
     "contact": "CONTACT"
   },
@@ -54,45 +54,85 @@
     "ca": "Catalan"
   },
   "projects": {
+    "0": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
     "1": {
-      "title": "INFLUENCE",
-      "description": "The forces that shape you"
+      "title": "FOLC EYEWEAR",
+      "description": "2024"
     },
     "2": {
-      "title": "ELEGANCE",
-      "description": "The art of refined simplicity"
+      "title": "AUTRY USA",
+      "description": "2023"
     },
     "3": {
-      "title": "AUTHENTICITY",
-      "description": "True to your essence"
+      "title": "SEIS DEL TRES",
+      "description": "2023"
     },
     "4": {
-      "title": "INNOVATION",
-      "description": "Breaking boundaries in design"
+      "title": "SCHON MAGAZINE",
+      "description": "2023"
     },
     "5": {
-      "title": "HERITAGE",
-      "description": "Timeless traditions reimagined"
+      "title": "E-COMMERCE TOUS",
+      "description": "2023"
     },
     "6": {
-      "title": "EXPRESSION",
-      "description": "Your style, your story"
+      "title": "AZZARO PARFUMS",
+      "description": "2023"
     },
     "7": {
-      "title": "IDENTITY",
-      "description": "Fashion as self-discovery"
+      "title": "NIKE X GLAMOUR",
+      "description": "2022"
     },
     "8": {
-      "title": "ARTISTRY",
-      "description": "Where craft meets vision"
+      "title": "SAN VALENTIN, TOUS",
+      "description": "2022"
     },
     "9": {
-      "title": "EVOLUTION",
-      "description": "Constant transformation"
+      "title": "WONDERLAND MAGAZINE, SPECIAL PRADA",
+      "description": "2022"
     },
     "10": {
-      "title": "HARMONY",
-      "description": "Balance in motion"
+      "title": "LOEWE X STUDIO GHIBLI, MYTHERESA",
+      "description": "2021"
+    },
+    "11": {
+      "title": "MARIE CLAIRE MEXICO, OCTOBER ISSUE",
+      "description": "2021"
+    },
+    "12": {
+      "title": "LEVI'S",
+      "description": "2021"
+    },
+    "13": {
+      "title": "HARPER'S BAZAAR MEXICO, AUGUST ISSUE",
+      "description": "2021"
+    },
+    "14": {
+      "title": "MAISONETTE, 'BACK TO SCHOOL'",
+      "description": "2021"
+    },
+    "15": {
+      "title": "BEATRIZ FUREST, SS",
+      "description": "2021"
+    },
+    "16": {
+      "title": "SPOT CODORNIU USA",
+      "description": "2021"
+    },
+    "17": {
+      "title": "PLAZA KVINNA, AUGUST ISSUE",
+      "description": "2021"
+    },
+    "18": {
+      "title": "DSCENE, SUMMER ISSUE",
+      "description": "2021"
+    },
+    "19": {
+      "title": "EIKO AI, 080 BARCELONA",
+      "description": "2021"
     }
   },
   "footer": {

@@ -32,7 +32,7 @@ export default function Navigation() {
           href={`/${locale}`}
           className={`nav-link ${isHomePage ? 'text-red-500' : ''}`}
         >
-          {t('overview')}
+          {t('projects')}
         </Link>
         <Link 
           href={`/${locale}/about`}

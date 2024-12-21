@@ -1,6 +1,6 @@
 {
   "navigation": {
-    "overview": "INICI",
+    "projects": "PROJECTES",
     "about": "SOBRE MI",
     "contact": "CONTACTE"
   },
@@ -54,45 +54,85 @@
     "ca": "Català"
   },
   "projects": {
+    "0": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
     "1": {
-      "title": "INFLUÈNCIA",
-      "description": "Les forces que et modelen"
+      "title": "FOLC EYEWEAR",
+      "description": "2024"
     },
     "2": {
-      "title": "ELEGÀNCIA",
-      "description": "L'art de la simplicitat refinada"
+      "title": "AUTRY USA",
+      "description": "2023"
     },
     "3": {
-      "title": "AUTENTICITAT",
-      "description": "Fidel a la teva essència"
-    },
-    "4": {
       "title": "INNOVACIÓ",
       "description": "Trencant límits en disseny"
     },
-    "5": {
+    "4": {
       "title": "HERÈNCIA",
       "description": "Tradicions atemporals reimaginades"
     },
-    "6": {
+    "5": {
       "title": "EXPRESSIÓ",
       "description": "El teu estil, la teva història"
     },
-    "7": {
+    "6": {
       "title": "IDENTITAT",
       "description": "La moda com autodescobriment"
     },
-    "8": {
+    "7": {
       "title": "ART",
       "description": "On l'ofici troba la visió"
     },
-    "9": {
+    "8": {
       "title": "EVOLUCIÓ",
       "description": "Transformació constant"
     },
-    "10": {
+    "9": {
       "title": "HARMONIA",
       "description": "Equilibri en moviment"
+    },
+    "10": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
+    "11": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
+    "12": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
+    "13": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
+    "14": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
+    "15": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
+    "16": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
+    "17": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
+    "18": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
+    },
+    "19": {
+      "title": "CONTRIBUTOR MAGAZINE",
+      "description": "2024"
     }
   },
   "footer": {

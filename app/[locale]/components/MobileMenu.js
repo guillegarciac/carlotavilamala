@@ -41,7 +41,7 @@ export default function MobileMenu({ currentPath }) {
                 className={isHomePage ? 'text-red-500' : ''}
                 onClick={() => setIsOpen(false)}
               >
-                {t('overview')}
+                {t('projects')}
               </Link>
               <Link 
                 href={`/${locale}/about`}
