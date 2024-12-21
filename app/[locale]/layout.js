@@ -43,11 +43,11 @@ export function generateMetadata({ params: { locale } }) {
 
   return {
     title: "Carlota Vilamala",
-    description: "Fashion Stylist & Creative Direction",
+    description: "Fashion Stylist and Creative Direction",
     metadataBase: new URL(baseUrl),
     openGraph: {
       title: 'Carlota Vilamala',
-      description: 'Fashion Stylist & Creative Direction',
+      description: 'Fashion Stylist and Creative Direction',
       url: url,
       type: 'website',
       images: [
@@ -61,7 +61,7 @@ export function generateMetadata({ params: { locale } }) {
       card: 'summary_large_image',
       domain: 'carlotavilamala.vercel.app',
       title: 'Carlota Vilamala',
-      description: 'Fashion Stylist & Creative Direction',
+      description: 'Fashion Stylist and Creative Direction',
       url: url,
       images: [imageUrl],
     },

@@ -9,7 +9,9 @@ export default function Home({ params: { locale } }) {
     <div className="min-h-screen">
       <Navigation />
       
-      <main className="px-8 mt-8 md:mt-8 pt-24 md:pt-0">
+      <main className="px-8 pt-24 md:pt-20 transition-opacity duration-[800ms] delay-[400ms]
+        opacity-0 animate-fadeIn"
+      >
         <ImageGallery projects={projects} />
       </main>
     </div>

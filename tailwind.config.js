@@ -13,6 +13,15 @@ module.exports = {
       screens: {
         'landscape': {'raw': '(orientation: landscape)'},
       },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        }
+      },
+      animation: {
+        fadeIn: 'fadeIn 800ms ease-out forwards',
+      }
     },
   },
   plugins: [],
