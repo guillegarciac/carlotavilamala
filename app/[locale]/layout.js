@@ -55,6 +55,7 @@ export function generateMetadata({ params: { locale } }) {
           url: imageUrl,
         },
       ],
+      updated_time: timestamp.toString(),
     },
     twitter: {
       card: 'summary_large_image',
