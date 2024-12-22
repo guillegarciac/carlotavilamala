@@ -25,8 +25,12 @@ export default async function LocaleLayout({ children, params: { locale } }) {
     <html lang={locale}>
       <head>
         <link rel="icon" href="/favicon.ico" />
+        <meta 
+          name="viewport" 
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+        />
       </head>
-      <body className={`${playfair.className} antialiased min-h-screen flex flex-col`}>
+      <body className={`${playfair.className} antialiased`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <GalleryProvider>
             {children}

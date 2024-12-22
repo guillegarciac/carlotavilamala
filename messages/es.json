@@ -40,8 +40,8 @@
       "name": "Nombre",
       "email": "Correo electrónico",
       "message": "Mensaje",
-      "send": "ENVIAR!",
-      "sending": "ENVIANDO..."
+      "send": "Enviar",
+      "sending": "Enviando..."
     },
     "toast": {
       "loading": "Enviando mensaje...",

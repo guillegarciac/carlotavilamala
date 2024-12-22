@@ -1,12 +1,13 @@
 "use client";
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import emailjs from '@emailjs/browser';
 import Navigation from "./Navigation";
 import { Playfair_Display } from "next/font/google";
 import { Toaster, toast } from 'react-hot-toast';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
+import { IoSend } from "react-icons/io5";
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -20,6 +21,21 @@ export default function ContactClient() {
   const locale = useLocale();
   const router = useRouter();
   const [isFormValid, setIsFormValid] = useState(false);
+
+  useEffect(() => {
+    // Hide footer when contact page is mounted
+    const footer = document.querySelector('footer');
+    if (footer) {
+      footer.style.display = 'none';
+    }
+    
+    // Show footer when component unmounts
+    return () => {
+      if (footer) {
+        footer.style.display = 'block';
+      }
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -82,7 +98,7 @@ export default function ContactClient() {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="h-screen fixed inset-0 overflow-hidden">
       <Navigation />
       <Toaster 
         position="bottom-center"
@@ -104,7 +120,7 @@ export default function ContactClient() {
         }}
       />
 
-      <main className="px-8 pt-24 pb-24 md:pt-20 md:pb-0 h-[calc(100vh-80px)] flex flex-col">
+      <main className="px-8 pt-20 md:pt-20 h-[calc(100vh-80px)] flex flex-col overflow-hidden">
         <div>
           <h2 className={`text-base tracking-wider font-light italic mb-12 ${playfair.className}`}>
             {t('title')}
@@ -114,7 +130,7 @@ export default function ContactClient() {
             ref={formRef} 
             onSubmit={handleSubmit} 
             id="contact-form"
-            className="flex flex-col h-full" 
+            className="flex flex-col h-[calc(100vh-240px)]"
             onChange={checkFormValidity}
           >
             <div className="mb-8">
@@ -123,9 +139,9 @@ export default function ContactClient() {
                 name="name"
                 placeholder={t('form.name')}
                 required
-                className="w-full border-b border-black/20 py-2 px-0 text-sm 
+                className="w-full border-b border-black/20 py-3 px-0 text-base 
                   bg-[#faf9f6] focus:outline-none focus:border-black/40 
-                  transition-colors"
+                  transition-colors touch-manipulation"
               />
             </div>
 
@@ -135,20 +151,20 @@ export default function ContactClient() {
                 name="email"
                 placeholder={t('form.email')}
                 required
-                className="w-full border-b border-black/20 py-2 px-0 text-sm 
+                className="w-full border-b border-black/20 py-3 px-0 text-base 
                   bg-[#faf9f6] focus:outline-none focus:border-black/40 
-                  transition-colors"
+                  transition-colors touch-manipulation"
               />
             </div>
 
-            <div className="flex-grow mb-8">
+            <div className="flex-1 min-h-0">
               <textarea
                 name="message"
                 placeholder={t('form.message')}
                 required
-                className="w-full h-full border-b border-black/20 py-2 px-0 text-sm 
+                className="w-full h-full border-b border-black/20 py-3 px-0 text-base 
                   bg-[#faf9f6] focus:outline-none focus:border-black/40 
-                  transition-colors resize-none min-h-[200px]"
+                  transition-colors resize-none touch-manipulation"
               />
             </div>
           </form>
@@ -159,13 +175,14 @@ export default function ContactClient() {
             type="submit"
             form="contact-form"
             disabled={sending}
-            className={`w-full py-3 transition-all text-sm
+            className={`w-full py-3 transition-all text-sm flex items-center justify-center gap-2
               ${isFormValid 
                 ? 'bg-red-500 hover:bg-red-600 text-white' 
                 : 'bg-[#faf9f6] border border-black hover:bg-black hover:text-white'
               } 
               disabled:opacity-50`}
           >
+            <IoSend className="text-base" />
             {sending ? t('form.sending') : t('form.send')}
           </button>
         </div>
