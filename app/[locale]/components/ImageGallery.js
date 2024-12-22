@@ -3,11 +3,18 @@
 import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslations } from 'next-intl';
+import { useGallery } from '../context/GalleryContext';
 
 export default function ImageGallery({ projects }) {
   const t = useTranslations('projects');
   const [selectedImage, setSelectedImage] = useState(null);
   const [focusedImage, setFocusedImage] = useState(null);
+  const { setIsGalleryOpen } = useGallery();
+
+  useEffect(() => {
+    setIsGalleryOpen(!!selectedImage);
+    return () => setIsGalleryOpen(false);
+  }, [selectedImage, setIsGalleryOpen]);
 
   // Create refs for each project
   const projectRefs = useRef(new Map());
@@ -131,6 +138,24 @@ export default function ImageGallery({ projects }) {
     }
   }, [selectedImage, projects]);
 
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (selectedImage) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = 'unset';
+      document.body.style.position = 'static';
+      document.body.style.width = 'auto';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.body.style.position = 'static';
+      document.body.style.width = 'auto';
+    };
+  }, [selectedImage]);
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 -mt-4">
@@ -152,8 +177,9 @@ export default function ImageGallery({ projects }) {
                        (max-width: 1280px) 25vw,
                        20vw"
                 className="object-cover transition-all duration-700 group-hover:scale-[1.02]"
-                priority={project.id <= 4}
-                quality={95}
+                priority={project.id <= 8}
+                quality={75}
+                loading={project.id <= 8 ? "eager" : "lazy"}
               />
               <div 
                 className={`absolute inset-0 transition-colors duration-300
@@ -182,14 +208,18 @@ export default function ImageGallery({ projects }) {
       {/* Modal */}
       {selectedImage && (
         <div 
-          className="fixed inset-0 bg-[#faf9f6] z-50 flex items-center justify-center touch-pan-y"
+          className={`fixed bg-[#faf9f6] flex items-center justify-center touch-pan-y
+            inset-0
+            ${window.innerWidth >= 768 ? 'md:top-[80px]' : 'top-0'}
+            z-[200] md:z-50`}
           onClick={handleClose}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
           onTouchEnd={onTouchEnd}
         >
+          {/* Mobile close button */}
           <button 
-            className="absolute top-8 right-8 z-50"
+            className="absolute top-4 right-4 z-[201] block"
             onClick={handleClose}
           >
             <div className="w-8 h-5 flex flex-col justify-center relative">
@@ -198,7 +228,7 @@ export default function ImageGallery({ projects }) {
             </div>
           </button>
 
-          {/* Previous Arrow + Title */}
+          {/* Previous Arrow + Title - Desktop Only */}
           <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
             <div 
               className="relative pl-6 cursor-pointer w-full"
@@ -221,7 +251,7 @@ export default function ImageGallery({ projects }) {
             </div>
           </div>
           
-          {/* Next Arrow + Title */}
+          {/* Next Arrow + Title - Desktop Only */}
           <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
             <div 
               className="relative pr-6 cursor-pointer w-full"
@@ -245,17 +275,18 @@ export default function ImageGallery({ projects }) {
           </div>
 
           <div 
-            className="relative w-full h-full md:px-40 md:py-8"
+            className="relative w-full h-full px-4 py-4 md:px-40 md:py-16"
             onClick={(e) => e.stopPropagation()}
           >
             <Image
               src={selectedImage.imageUrl}
               alt={t(`${selectedImage.id}.title`)}
               fill
-              sizes="100vw"
-              className="object-contain mx-auto !p-8 md:!p-16"
+              sizes="(max-width: 768px) 100vw, 80vw"
+              className="object-contain mx-auto md:scale-95"
               priority
-              quality={100}
+              quality={75}
+              loading="eager"
             />
             {/* Project Info - Desktop Only */}
             <div className="hidden md:block absolute bottom-8 right-8 text-right max-w-[300px] bg-[#faf9f6]/80 p-4">
@@ -268,6 +299,22 @@ export default function ImageGallery({ projects }) {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Preload next and previous images */}
+      {selectedImage && (
+        <>
+          <link
+            rel="preload"
+            as="image"
+            href={getAdjacentProject('next').imageUrl}
+          />
+          <link
+            rel="preload"
+            as="image"
+            href={getAdjacentProject('prev').imageUrl}
+          />
+        </>
       )}
     </>
   );

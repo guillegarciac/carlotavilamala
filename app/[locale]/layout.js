@@ -4,6 +4,7 @@ import { Playfair_Display } from "next/font/google";
 import { unstable_setRequestLocale } from 'next-intl/server';
 import "../globals.css";
 import Footer from './components/Footer';
+import { GalleryProvider } from './context/GalleryContext';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -27,8 +28,10 @@ export default async function LocaleLayout({ children, params: { locale } }) {
       </head>
       <body className={`${playfair.className} antialiased min-h-screen flex flex-col`}>
         <NextIntlClientProvider locale={locale} messages={messages}>
-          {children}
-          <Footer />
+          <GalleryProvider>
+            {children}
+            <Footer />
+          </GalleryProvider>
         </NextIntlClientProvider>
       </body>
     </html>
@@ -36,7 +39,7 @@ export default async function LocaleLayout({ children, params: { locale } }) {
 }
 
 export function generateMetadata({ params: { locale } }) {
-  const baseUrl = 'https://carlotavilamala.vercel.app';
+  const baseUrl = 'https://carlotavilamala.com';
   const timestamp = Date.now();
   const url = `${baseUrl}/${locale}?v=${timestamp}`;
   const imageUrl = `/og-image.jpg?v=${timestamp}`;
@@ -59,7 +62,7 @@ export function generateMetadata({ params: { locale } }) {
     },
     twitter: {
       card: 'summary_large_image',
-      domain: 'carlotavilamala.vercel.app',
+      domain: 'carlotavilamala.com',
       title: 'Carlota Vilamala',
       description: 'Fashion Stylist and Creative Direction',
       url: url,

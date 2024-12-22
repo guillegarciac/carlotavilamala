@@ -8,6 +8,7 @@ import Link from "next/link";
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { useGallery } from '../context/GalleryContext';
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -21,6 +22,39 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showTitle, setShowTitle] = useState(false);
+  const { isGalleryOpen } = useGallery();
+
+  // Show animation on page refresh but not on navigation
+  useEffect(() => {
+    const isNavigating = sessionStorage.getItem('isNavigating');
+    
+    if (isNavigating) {
+      setIsLoading(false);
+      setShowTitle(false);
+      return;
+    }
+    
+    setTimeout(() => {
+      setShowTitle(true);
+    }, 300);
+    
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+      sessionStorage.setItem('isNavigating', 'true');
+    }, 2000);
+    
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Reset navigation flag on page refresh
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      sessionStorage.removeItem('isNavigating');
+    };
+    
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -29,19 +63,6 @@ export default function Navigation() {
 
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    // Two-phase animation
-    setTimeout(() => {
-      setShowTitle(true);
-    }, 300);
-    
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 2000);
-    
-    return () => clearTimeout(timer);
   }, []);
 
   // Helper function to check if it's the home page
@@ -70,7 +91,8 @@ export default function Navigation() {
       </div>
 
       <nav className={`fixed top-0 left-0 right-0 flex justify-center items-center px-8 bg-[#faf9f6] z-50 transition-all duration-[1200ms]
-        ${isScrolled ? 'py-2 md:py-3' : 'py-4 md:py-6'}
+        ${isGalleryOpen ? 'md:flex hidden' : 'flex'}
+        py-4 md:${isScrolled ? 'py-3' : 'py-6'}
       `}>
         {/* Mobile Menu */}
         <MobileMenu currentPath={pathname} />
@@ -102,7 +124,7 @@ export default function Navigation() {
         <Link 
           href={`/${locale}`} 
           className={`text-base tracking-[0.2em] ${playfair.className} ml-8 md:ml-0 transition-all duration-[1200ms]
-            ${isScrolled ? 'md:text-lg' : 'md:text-xl'}
+            text-base md:${isScrolled ? 'text-lg' : 'text-xl'}
             ${!isLoading ? 'opacity-100' : 'opacity-0'}`}
         >
           CARLOTA VILAMALA
@@ -119,7 +141,7 @@ export default function Navigation() {
               target="_blank" 
               rel="noopener noreferrer"
             >
-              <FaInstagram size={isScrolled ? 18 : 20} className="transition-all duration-300" />
+              <FaInstagram size={isScrolled ? 18 : 20} className="transition-all duration-300 hidden md:block" />
             </a>
             <a 
               href="https://www.linkedin.com/in/carlota-vilamala-reig/" 
@@ -127,7 +149,7 @@ export default function Navigation() {
               target="_blank" 
               rel="noopener noreferrer"
             >
-              <FaLinkedin size={isScrolled ? 18 : 20} className="transition-all duration-300" />
+              <FaLinkedin size={isScrolled ? 18 : 20} className="transition-all duration-300 hidden md:block" />
             </a>
           </div>
         </div>
