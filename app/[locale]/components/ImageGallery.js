@@ -48,8 +48,12 @@ export default function ImageGallery({ projects }) {
 
   const touchStart = useRef(null);
   const touchEnd = useRef(null);
+  const [minSwipeDistance, setMinSwipeDistance] = useState(0);
 
-  const minSwipeDistance = 50;
+  useEffect(() => {
+    // Set minSwipeDistance once we're in the browser
+    setMinSwipeDistance(window.innerWidth * 0.15);
+  }, []);
 
   const onTouchStart = (e) => {
     touchEnd.current = null;
@@ -59,8 +63,8 @@ export default function ImageGallery({ projects }) {
   const onTouchMove = (e) => {
     touchEnd.current = e.targetTouches[0].clientX;
     if (touchStart.current) {
-      const progress = (touchStart.current - e.targetTouches[0].clientX) / window.innerWidth;
-      setSwipeProgress(Math.max(-1, Math.min(1, progress)));
+      const progress = touchStart.current - e.targetTouches[0].clientX;
+      setSwipeProgress(progress);
     }
   };
 
@@ -71,13 +75,15 @@ export default function ImageGallery({ projects }) {
     const isLeftSwipe = distance > minSwipeDistance;
     const isRightSwipe = distance < -minSwipeDistance;
 
+    // Reset progress first to prevent jump
+    setSwipeProgress(0);
+
     if (isLeftSwipe) {
       navigateToNext();
     }
     if (isRightSwipe) {
       navigateToPrev();
     }
-    setSwipeProgress(0);
   };
 
   const handleKeyDown = useCallback((e) => {
@@ -216,7 +222,7 @@ export default function ImageGallery({ projects }) {
         <div 
           className={`fixed bg-[#faf9f6] flex items-center justify-center touch-pan-y
             inset-0
-            ${window.innerWidth >= 768 ? 'md:top-[80px]' : 'top-0'}
+            md:top-[80px]
             z-[200] md:z-50`}
           onClick={handleClose}
           onTouchStart={onTouchStart}
@@ -226,7 +232,7 @@ export default function ImageGallery({ projects }) {
           {/* Mobile close button */}
           <button 
             className={`absolute top-6 right-6 z-[201] block 
-              ${window.innerWidth < 768 ? 'bg-white rounded-full shadow-md' : ''} 
+              md:bg-transparent md:shadow-none bg-white rounded-full shadow-md
               w-8 h-8 flex items-center justify-center`}
             onClick={handleClose}
           >
@@ -314,9 +320,9 @@ export default function ImageGallery({ projects }) {
                 alt={t(`${selectedImage.id}.title`)}
                 fill
                 sizes="(max-width: 768px) 100vw, 80vw"
-                className="object-cover md:object-contain mx-auto transition-transform duration-300"
+                className="object-cover md:object-contain mx-auto"
                 style={{
-                  transform: `translateX(${-swipeProgress * 100}px)`,
+                  transform: `translateX(${-swipeProgress}px)`,
                 }}
                 priority
                 quality={75}
@@ -325,20 +331,19 @@ export default function ImageGallery({ projects }) {
             </div>
 
             {/* Next/Prev Images for Transition */}
-            {swipeProgress !== 0 && (
-              <div className="absolute inset-0 md:w-[1000px] lg:w-[1200px] xl:w-[1400px] 2xl:w-[1600px]
-                h-[calc(100vh-128px)] md:h-[calc(100vh-80px)]
-                mx-auto"
-              >
+            {Math.abs(swipeProgress) > 0 && (
+              <div className="absolute inset-0 h-[calc(100vh-128px)] md:h-[calc(100vh-80px)]">
                 <Image
                   src={getAdjacentProject(swipeProgress > 0 ? 'next' : 'prev').imageUrl}
                   alt=""
                   fill
                   sizes="100vw"
-                  className="object-cover md:object-contain mx-auto transition-transform duration-300"
+                  className="object-cover md:object-contain mx-auto"
                   style={{
-                    transform: `translateX(${swipeProgress > 0 ? 100 - (swipeProgress * 100) : -100 - (swipeProgress * 100)}px)`,
-                    opacity: Math.abs(swipeProgress)
+                    transform: `translateX(${swipeProgress > 0 ? 
+                      (window.innerWidth - swipeProgress) : 
+                      (-window.innerWidth - swipeProgress)}px)`,
+                    opacity: 1
                   }}
                   priority
                   quality={75}
@@ -355,34 +360,34 @@ export default function ImageGallery({ projects }) {
                   const totalDots = projects.length;
                   const dotsToShow = 5;
                   return Array.from({ length: dotsToShow }, (_, i) => {
-                    // Calculate index with circular wrapping
                     const centerOffset = i - Math.floor(dotsToShow / 2);
                     let dotIndex = (currentIndex + centerOffset + totalDots) % totalDots;
                     
                     // Calculate relative position considering circular navigation
-                    const positionOffset = centerOffset - swipeProgress;
+                    const positionOffset = centerOffset;
+                    const swipeOffset = swipeProgress/window.innerWidth;
                     
                     const baseSize = 'h-2 w-2 mx-2';
                     
                     // Calculate scale with smoother transitions
-                    const maxScale = 1.4; // Slightly smaller max scale
-                    const minScale = 0.6; // Smaller edge dots
-                    const scaleRange = maxScale - minScale;
+                    const maxScale = 1.4;
+                    const minScale = 0.6;
                     
                     // More dramatic scale reduction towards edges
-                    const scale = maxScale - (Math.abs(positionOffset) * 0.5);
+                    const scale = Math.max(
+                      minScale,
+                      maxScale - (Math.abs(positionOffset + swipeOffset) * 0.5)
+                    );
                     
                     // Smooth color transition
-                    const isActive = Math.abs(positionOffset) < 0.5;
+                    const isActive = Math.abs(positionOffset + swipeOffset) < 0.5;
                     const color = isActive ? '#ff3040' : '#d1d1d1';
                     
                     // Smooth opacity transition for edge dots
-                    const opacity = Math.max(0.3, 1 - (Math.abs(positionOffset) * 0.4));
+                    const opacity = Math.max(0.3, 1 - Math.abs(positionOffset + swipeOffset));
                     
                     // Calculate horizontal movement
-                    const baseMove = -swipeProgress * 16; // Reversed direction
-                    const edgeMove = -Math.sign(positionOffset) * Math.max(0, (Math.abs(positionOffset) - 1) * 8);
-                    const moveX = baseMove + edgeMove; // Combined movement
+                    const moveX = 0;
                     
                     return (
                       <div
@@ -393,7 +398,7 @@ export default function ImageGallery({ projects }) {
                           transform: `translateX(${moveX}px) scale(${scale})`,
                           backgroundColor: color,
                           opacity: opacity,
-                          transition: swipeProgress === 0 ? 'transform 0.2s linear, opacity 0.2s linear, background-color 0.2s linear' : 'none'
+                          transition: 'none'
                         }}
                       />
                     );
