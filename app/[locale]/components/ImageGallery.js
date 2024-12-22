@@ -283,11 +283,20 @@ export default function ImageGallery({ projects }) {
               alt={t(`${selectedImage.id}.title`)}
               fill
               sizes="(max-width: 768px) 100vw, 80vw"
-              className="object-contain mx-auto md:scale-95"
+              className="object-contain mx-auto"
               priority
               quality={75}
               loading="eager"
             />
+            {/* Project Info - Mobile */}
+            <div className="absolute bottom-8 left-0 right-0 px-4 text-center md:hidden">
+              <h3 className="text-sm font-medium tracking-wider mb-1">
+                {t(`${selectedImage.id}.title`)}
+              </h3>
+              <p className="text-xs font-light">
+                {t(`${selectedImage.id}.description`)}
+              </p>
+            </div>
             {/* Project Info - Desktop Only */}
             <div className="hidden md:block absolute bottom-8 right-8 text-right max-w-[300px] bg-[#faf9f6]/80 p-4">
               <h3 className="text-sm font-medium tracking-wider mb-1 whitespace-nowrap">
