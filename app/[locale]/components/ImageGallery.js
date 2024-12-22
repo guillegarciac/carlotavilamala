@@ -9,6 +9,7 @@ export default function ImageGallery({ projects }) {
   const t = useTranslations('projects');
   const [selectedImage, setSelectedImage] = useState(null);
   const [focusedImage, setFocusedImage] = useState(null);
+  const [swipeProgress, setSwipeProgress] = useState(0);
   const { setIsGalleryOpen } = useGallery();
 
   useEffect(() => {
@@ -57,6 +58,10 @@ export default function ImageGallery({ projects }) {
 
   const onTouchMove = (e) => {
     touchEnd.current = e.targetTouches[0].clientX;
+    if (touchStart.current) {
+      const progress = (touchStart.current - e.targetTouches[0].clientX) / window.innerWidth;
+      setSwipeProgress(Math.max(-1, Math.min(1, progress)));
+    }
   };
 
   const onTouchEnd = () => {
@@ -72,6 +77,7 @@ export default function ImageGallery({ projects }) {
     if (isRightSwipe) {
       navigateToPrev();
     }
+    setSwipeProgress(0);
   };
 
   const handleKeyDown = useCallback((e) => {
@@ -219,12 +225,14 @@ export default function ImageGallery({ projects }) {
         >
           {/* Mobile close button */}
           <button 
-            className="absolute top-4 right-4 z-[201] block"
+            className={`absolute top-6 right-6 z-[201] block 
+              ${window.innerWidth < 768 ? 'bg-white rounded-full shadow-md' : ''} 
+              w-8 h-8 flex items-center justify-center`}
             onClick={handleClose}
           >
-            <div className="w-8 h-5 flex flex-col justify-center relative">
-              <span className="w-full h-[1px] bg-black absolute rotate-45" />
-              <span className="w-full h-[1px] bg-black absolute -rotate-45" />
+            <div className="w-4 h-4 flex flex-col justify-center relative">
+              <span className="w-full h-[1.5px] bg-black absolute rotate-45" />
+              <span className="w-full h-[1.5px] bg-black absolute -rotate-45" />
             </div>
           </button>
 
@@ -275,36 +283,133 @@ export default function ImageGallery({ projects }) {
           </div>
 
           <div 
-            className="relative w-full h-full px-4 py-4 md:px-40 md:py-16"
+            className="relative w-full h-full flex flex-col items-center"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image
-              src={selectedImage.imageUrl}
-              alt={t(`${selectedImage.id}.title`)}
-              fill
-              sizes="(max-width: 768px) 100vw, 80vw"
-              className="object-contain mx-auto"
-              priority
-              quality={75}
-              loading="eager"
-            />
-            {/* Project Info - Mobile */}
-            <div className="absolute bottom-8 left-0 right-0 px-4 text-center md:hidden">
-              <h3 className="text-sm font-medium tracking-wider mb-1">
-                {t(`${selectedImage.id}.title`)}
-              </h3>
-              <p className="text-xs font-light">
-                {t(`${selectedImage.id}.description`)}
-              </p>
-            </div>
             {/* Project Info - Desktop Only */}
-            <div className="hidden md:block absolute bottom-8 right-8 text-right max-w-[300px] bg-[#faf9f6]/80 p-4">
-              <h3 className="text-sm font-medium tracking-wider mb-1 whitespace-nowrap">
-                {t(`${selectedImage.id}.title`)}
-              </h3>
-              <p className="text-xs font-light whitespace-nowrap">
-                {t(`${selectedImage.id}.description`)}
-              </p>
+            <div className="hidden md:block w-full text-center -mt-2">
+              <div className="w-full text-center bg-[#faf9f6]/80 py-1.5">
+                <h3 className="text-sm font-medium tracking-wider mb-0.5
+                  whitespace-nowrap
+                  text-[11px] md:text-xs
+                ">
+                  {t(`${selectedImage.id}.title`)}
+                </h3>
+                <p className="text-xs font-light 
+                  whitespace-nowrap
+                  text-[10px] md:text-[11px]
+                ">
+                  {t(`${selectedImage.id}.description`)}
+                </p>
+              </div>
+            </div>
+
+            {/* Image Container */}
+            <div className="relative w-full md:w-[1000px] lg:w-[1200px] xl:w-[1400px] 2xl:w-[1600px]
+              h-[calc(100vh-128px)] md:h-[calc(100vh-105px)]
+              mx-auto"
+            >
+              <Image
+                src={selectedImage.imageUrl}
+                alt={t(`${selectedImage.id}.title`)}
+                fill
+                sizes="(max-width: 768px) 100vw, 80vw"
+                className="object-cover md:object-contain mx-auto transition-transform duration-300"
+                style={{
+                  transform: `translateX(${-swipeProgress * 100}px)`,
+                }}
+                priority
+                quality={75}
+                loading="eager"
+              />
+            </div>
+
+            {/* Next/Prev Images for Transition */}
+            {swipeProgress !== 0 && (
+              <div className="absolute inset-0 md:w-[1000px] lg:w-[1200px] xl:w-[1400px] 2xl:w-[1600px]
+                h-[calc(100vh-128px)] md:h-[calc(100vh-80px)]
+                mx-auto"
+              >
+                <Image
+                  src={getAdjacentProject(swipeProgress > 0 ? 'next' : 'prev').imageUrl}
+                  alt=""
+                  fill
+                  sizes="100vw"
+                  className="object-cover md:object-contain mx-auto transition-transform duration-300"
+                  style={{
+                    transform: `translateX(${swipeProgress > 0 ? 100 - (swipeProgress * 100) : -100 - (swipeProgress * 100)}px)`,
+                    opacity: Math.abs(swipeProgress)
+                  }}
+                  priority
+                  quality={75}
+                />
+              </div>
+            )}
+
+            {/* Mobile Info Container */}
+            <div className="fixed left-0 right-0 bottom-0 h-36 bg-[#faf9f6] flex flex-col justify-center items-center md:hidden">
+              {/* Swipe Indicator Dots */}
+              <div className="flex justify-center items-center overflow-visible h-8 mb-4">
+                {(() => {
+                  const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+                  const totalDots = projects.length;
+                  const dotsToShow = 5;
+                  return Array.from({ length: dotsToShow }, (_, i) => {
+                    // Calculate index with circular wrapping
+                    const centerOffset = i - Math.floor(dotsToShow / 2);
+                    let dotIndex = (currentIndex + centerOffset + totalDots) % totalDots;
+                    
+                    // Calculate relative position considering circular navigation
+                    const positionOffset = centerOffset - swipeProgress;
+                    
+                    const baseSize = 'h-2 w-2 mx-2';
+                    
+                    // Calculate scale with smoother transitions
+                    const maxScale = 1.4; // Slightly smaller max scale
+                    const minScale = 0.6; // Smaller edge dots
+                    const scaleRange = maxScale - minScale;
+                    
+                    // More dramatic scale reduction towards edges
+                    const scale = maxScale - (Math.abs(positionOffset) * 0.5);
+                    
+                    // Smooth color transition
+                    const isActive = Math.abs(positionOffset) < 0.5;
+                    const color = isActive ? '#ff3040' : '#d1d1d1';
+                    
+                    // Smooth opacity transition for edge dots
+                    const opacity = Math.max(0.3, 1 - (Math.abs(positionOffset) * 0.4));
+                    
+                    // Calculate horizontal movement
+                    const baseMove = -swipeProgress * 16; // Reversed direction
+                    const edgeMove = -Math.sign(positionOffset) * Math.max(0, (Math.abs(positionOffset) - 1) * 8);
+                    const moveX = baseMove + edgeMove; // Combined movement
+                    
+                    return (
+                      <div
+                        key={dotIndex}
+                        className={`rounded-full transition-none ${baseSize}
+                          transform-gpu will-change-transform`}
+                        style={{
+                          transform: `translateX(${moveX}px) scale(${scale})`,
+                          backgroundColor: color,
+                          opacity: opacity,
+                          transition: swipeProgress === 0 ? 'transform 0.2s linear, opacity 0.2s linear, background-color 0.2s linear' : 'none'
+                        }}
+                      />
+                    );
+                  });
+                })()}
+              </div>
+
+              {/* Project Info - Mobile */}
+              <div className="px-4 text-center">
+                <h3 className="text-sm font-medium tracking-wider mb-1">
+                  {t(`${selectedImage.id}.title`)}
+                </h3>
+                <p className="text-xs font-light">
+                  {t(`${selectedImage.id}.description`)}
+                </p>
+              </div>
             </div>
           </div>
         </div>

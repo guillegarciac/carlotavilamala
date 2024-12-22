@@ -19,6 +19,7 @@ export default function ContactClient() {
   const t = useTranslations('contact');
   const locale = useLocale();
   const router = useRouter();
+  const [isFormValid, setIsFormValid] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -66,6 +67,20 @@ export default function ContactClient() {
     setSending(false);
   };
 
+  const checkFormValidity = () => {
+    const nameInput = formRef.current?.['name'];
+    const emailInput = formRef.current?.['email'];
+    const messageInput = formRef.current?.['message'];
+    
+    const isValid = 
+      nameInput?.value.trim() !== '' && 
+      emailInput?.value.trim() !== '' && 
+      messageInput?.value.trim() !== '' &&
+      emailInput?.validity.valid;
+    
+    setIsFormValid(isValid);
+  };
+
   return (
     <div className="min-h-screen">
       <Navigation />
@@ -89,13 +104,19 @@ export default function ContactClient() {
         }}
       />
 
-      <main className="px-8 mt-8 md:mt-8 pt-24 md:pt-0">
-        <div className="max-w-screen-lg mx-auto">
+      <main className="px-8 pt-24 pb-24 md:pt-20 md:pb-0 h-[calc(100vh-80px)] flex flex-col">
+        <div>
           <h2 className={`text-base tracking-wider font-light italic mb-12 ${playfair.className}`}>
             {t('title')}
           </h2>
 
-          <form ref={formRef} onSubmit={handleSubmit} className="max-w-2xl">
+          <form 
+            ref={formRef} 
+            onSubmit={handleSubmit} 
+            id="contact-form"
+            className="flex flex-col h-full" 
+            onChange={checkFormValidity}
+          >
             <div className="mb-8">
               <input
                 type="text"
@@ -120,28 +141,33 @@ export default function ContactClient() {
               />
             </div>
 
-            <div className="mb-8">
+            <div className="flex-grow mb-8">
               <textarea
                 name="message"
                 placeholder={t('form.message')}
                 required
-                rows={6}
-                className="w-full border-b border-black/20 py-2 px-0 text-sm 
+                className="w-full h-full border-b border-black/20 py-2 px-0 text-sm 
                   bg-[#faf9f6] focus:outline-none focus:border-black/40 
-                  transition-colors resize-none"
+                  transition-colors resize-none min-h-[200px]"
               />
             </div>
-
-            <button
-              type="submit"
-              disabled={sending}
-              className="border border-black px-8 py-2 text-sm hover:bg-black 
-                hover:text-white transition-colors disabled:opacity-50 
-                disabled:cursor-not-allowed"
-            >
-              {sending ? t('form.sending') : t('form.send')}
-            </button>
           </form>
+        </div>
+
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#faf9f6] border-t">
+          <button
+            type="submit"
+            form="contact-form"
+            disabled={sending}
+            className={`w-full py-3 transition-all text-sm
+              ${isFormValid 
+                ? 'bg-red-500 hover:bg-red-600 text-white' 
+                : 'bg-[#faf9f6] border border-black hover:bg-black hover:text-white'
+              } 
+              disabled:opacity-50`}
+          >
+            {sending ? t('form.sending') : t('form.send')}
+          </button>
         </div>
       </main>
     </div>
