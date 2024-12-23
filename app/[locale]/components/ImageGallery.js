@@ -2,26 +2,70 @@
 
 import Image from "next/image";
 import { useState, useCallback, useEffect, useRef } from "react";
-import { useTranslations } from 'next-intl';
-import { useGallery } from '../context/GalleryContext';
+import { useTranslations } from "next-intl";
+import { useGallery } from "../context/GalleryContext";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
+import { useRouter } from "next/navigation";
 
 export default function ImageGallery({ projects }) {
-  const t = useTranslations('projects');
+  const t = useTranslations("projects");
+  const router = useRouter();
   const [selectedImage, setSelectedImage] = useState(null);
   const [focusedImage, setFocusedImage] = useState(null);
   const [swipeProgress, setSwipeProgress] = useState(0);
   const { setIsGalleryOpen } = useGallery();
+  const projectRefs = useRef(new Map());
+  const swiperRef = useRef(null);
 
+  // Track swipe start/end points for mobile swiping between images
+  const touchStart = useRef(null);
+  const touchEnd = useRef(null);
+  const [minSwipeDistance, setMinSwipeDistance] = useState(0);
+
+  // Simplified close handler
+  const closeGallery = useCallback(() => {
+    // Destroy Swiper instance first
+    if (swiperRef.current) {
+      swiperRef.current.destroy(true, true);
+      swiperRef.current = null;
+    }
+    
+    // Then reset all states
+    setSelectedImage(null);
+    setIsGalleryOpen(false);
+    setSwipeProgress(0);
+    
+    // Reset body styles
+    document.body.style.overflow = 'unset';
+    document.body.style.position = 'static';
+    document.body.style.width = 'auto';
+    
+    // Finally navigate
+    router.push('/');
+  }, [setIsGalleryOpen, router]);
+
+  // Remove the selectedImage effect and handle body styles directly
   useEffect(() => {
-    setIsGalleryOpen(!!selectedImage);
-    return () => setIsGalleryOpen(false);
+    if (selectedImage) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+      setIsGalleryOpen(true);
+    }
+    
+    return () => {
+      document.body.style.overflow = 'unset';
+      document.body.style.position = 'static';
+      document.body.style.width = 'auto';
+      setIsGalleryOpen(false);
+    };
   }, [selectedImage, setIsGalleryOpen]);
 
-  // Create refs for each project
-  const projectRefs = useRef(new Map());
-
+  // INTERSECTION OBSERVER (mobile only)
   useEffect(() => {
-    // Only run on mobile devices
     if (window.innerWidth >= 768) return;
 
     const observer = new IntersectionObserver(
@@ -33,12 +77,11 @@ export default function ImageGallery({ projects }) {
         });
       },
       {
-        threshold: 0.7, // 70% of the item must be visible
-        rootMargin: '-20% 0px' // Adds a margin to trigger slightly before/after the item is fully visible
+        threshold: 0.7,
+        rootMargin: "-20% 0px",
       }
     );
 
-    // Observe all project elements
     projectRefs.current.forEach((ref) => {
       if (ref) observer.observe(ref);
     });
@@ -46,15 +89,12 @@ export default function ImageGallery({ projects }) {
     return () => observer.disconnect();
   }, []);
 
-  const touchStart = useRef(null);
-  const touchEnd = useRef(null);
-  const [minSwipeDistance, setMinSwipeDistance] = useState(0);
-
+  // Set minimum swipe distance on mount
   useEffect(() => {
-    // Set minSwipeDistance once we're in the browser
-    setMinSwipeDistance(window.innerWidth * 0.15);
+    setMinSwipeDistance(window.innerWidth * 0.15); // e.g., 15% of screen width
   }, []);
 
+  // TOUCH SWIPE HANDLERS (we attach these to the image container, not the entire backdrop)
   const onTouchStart = (e) => {
     touchEnd.current = null;
     touchStart.current = e.targetTouches[0].clientX;
@@ -86,90 +126,100 @@ export default function ImageGallery({ projects }) {
     }
   };
 
-  const handleKeyDown = useCallback((e) => {
-    if (!selectedImage) return;
-    
-    switch (e.key) {
-      case 'ArrowRight':
-        navigateToNext();
-        break;
-      case 'ArrowLeft':
-        navigateToPrev();
-        break;
-      case 'Escape':
-        setSelectedImage(null);
-        break;
-    }
-  }, [selectedImage]);
-
+  // NAVIGATION FUNCTIONS
   const navigateToNext = useCallback(() => {
     if (!selectedImage) return;
-    const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+    const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
     if (currentIndex === -1) return;
     const nextIndex = (currentIndex + 1) % projects.length;
     setSelectedImage(projects[nextIndex]);
+    swiperRef.current?.slideToLoop(nextIndex);
   }, [selectedImage, projects]);
 
   const navigateToPrev = useCallback(() => {
     if (!selectedImage) return;
-    const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+    const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
     if (currentIndex === -1) return;
     const prevIndex = currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
     setSelectedImage(projects[prevIndex]);
+    swiperRef.current?.slideToLoop(prevIndex);
   }, [selectedImage, projects]);
 
+  // HANDLE KEYBOARD EVENTS
+  const handleKeyDown = useCallback(
+    (e) => {
+      if (!selectedImage) return;
+      switch (e.key) {
+        case "ArrowRight":
+          navigateToNext();
+          break;
+        case "ArrowLeft":
+          navigateToPrev();
+          break;
+        case "Escape":
+          closeGallery();
+          break;
+      }
+    },
+    [selectedImage, navigateToNext, navigateToPrev, closeGallery]
+  );
+
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
   }, [handleKeyDown]);
 
-  const handleClose = () => {
-    setSelectedImage(null);
-  };
+  // GET ADJACENT PROJECT
+  const getAdjacentProject = useCallback(
+    (direction) => {
+      const currentIndex = projects.findIndex((p) => p.id === selectedImage?.id);
+      if (currentIndex === -1) return projects[0];
+      if (direction === "next") {
+        return projects[(currentIndex + 1) % projects.length];
+      } else {
+        return projects[currentIndex === 0 ? projects.length - 1 : currentIndex - 1];
+      }
+    },
+    [selectedImage, projects]
+  );
 
-  const handleNext = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigateToNext();
-  };
-
-  const handlePrev = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    navigateToPrev();
-  };
-
-  // Helper function to get next/prev project
-  const getAdjacentProject = useCallback((direction) => {
-    const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
-    if (currentIndex === -1) return projects[0];
-    if (direction === 'next') {
-      return projects[(currentIndex + 1) % projects.length];
-    } else {
-      return projects[currentIndex === 0 ? projects.length - 1 : currentIndex - 1];
+  // Swiper pagination bullet styles
+  const swiperStyles = `
+    .swiper-pagination-bullet {
+      transition: all 0.3s ease;
+      background: #8E8E8E;
+      opacity: 0.4;
     }
-  }, [selectedImage, projects]);
-
-  // Prevent body scroll when modal is open
-  useEffect(() => {
-    if (selectedImage) {
-      document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
-    } else {
-      document.body.style.overflow = 'unset';
-      document.body.style.position = 'static';
-      document.body.style.width = 'auto';
+    .swiper-pagination-bullet-active {
+      background: #EF4444 !important;
+      opacity: 1;
+      width: 16px !important;
+      height: 16px !important;
     }
-    return () => {
-      document.body.style.overflow = 'unset';
-      document.body.style.position = 'static';
-      document.body.style.width = 'auto';
-    };
-  }, [selectedImage]);
+    .swiper-pagination-bullet-active-prev,
+    .swiper-pagination-bullet-active-next {
+      width: 14px !important;
+      height: 14px !important;
+    }
+    .swiper-pagination-bullet-active-prev-prev,
+    .swiper-pagination-bullet-active-next-next {
+      width: 12px !important;
+      height: 12px !important;
+    }
+    .swiper-pagination-bullet-active-prev-prev-prev,
+    .swiper-pagination-bullet-active-next-next-next {
+      width: 10px !important;
+      height: 10px !important;
+    }
+    .swiper-pagination-bullet {
+      width: 8px !important;
+      height: 8px !important;
+    }
+  `;
 
   return (
     <>
+      {/* GALLERY GRID */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 -mt-4">
         {projects.map((project) => (
           <div
@@ -193,16 +243,16 @@ export default function ImageGallery({ projects }) {
                 quality={75}
                 loading={project.id <= 8 ? "eager" : "lazy"}
               />
-              <div 
+              <div
                 className={`absolute inset-0 transition-colors duration-300
                   md:bg-black/0 md:group-hover:bg-black/40
-                  ${focusedImage === project.id ? 'bg-black/40' : 'bg-black/0'}`}
+                  ${focusedImage === project.id ? "bg-black/40" : "bg-black/0"}`}
               >
-                <div 
+                <div
                   className={`absolute inset-0 flex flex-col items-center justify-center 
                     transition-opacity duration-300 text-white text-center p-4
                     md:opacity-0 md:group-hover:opacity-100
-                    ${focusedImage === project.id ? 'opacity-100' : 'opacity-0'}`}
+                    ${focusedImage === project.id ? "opacity-100" : "opacity-0"}`}
                 >
                   <h3 className="text-lg font-medium tracking-wider mb-2 transform transition-transform duration-300">
                     {t(`${project.id}.title`)}
@@ -217,24 +267,15 @@ export default function ImageGallery({ projects }) {
         ))}
       </div>
 
-      {/* Modal */}
+      {/* LIGHTBOX / MODAL */}
       {selectedImage && (
-        <div 
-          className={`fixed bg-[#faf9f6] flex items-center justify-center touch-pan-y
-            inset-0
-            md:top-[80px]
-            z-[200] md:z-50`}
-          onClick={handleClose}
-          onTouchStart={onTouchStart}
-          onTouchMove={onTouchMove}
-          onTouchEnd={onTouchEnd}
-        >
-          {/* Mobile close button */}
-          <button 
-            className={`absolute top-6 right-6 z-[201] block 
+        <div className="fixed inset-0 md:top-[80px] bg-[#faf9f6] z-[200] md:z-50">
+          {/* Close Button */}
+          <button
+            className="absolute top-6 right-6 z-[201] block 
               md:bg-transparent md:shadow-none bg-white rounded-full shadow-md
-              w-8 h-8 flex items-center justify-center`}
-            onClick={handleClose}
+              w-8 h-8 flex items-center justify-center"
+            onClick={closeGallery}
           >
             <div className="w-4 h-4 flex flex-col justify-center relative">
               <span className="w-full h-[1.5px] bg-black absolute rotate-45" />
@@ -242,12 +283,9 @@ export default function ImageGallery({ projects }) {
             </div>
           </button>
 
-          {/* Previous Arrow + Title - Desktop Only */}
+          {/* Prev Arrow + Title (Desktop only) */}
           <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
-            <div 
-              className="relative pl-6 cursor-pointer w-full"
-              onClick={handlePrev}
-            >
+            <div className="relative pl-6 cursor-pointer w-full" onClick={navigateToPrev}>
               <button
                 className="w-10 h-10 flex items-center justify-center transition-all duration-300 absolute top-1/2 -translate-y-1/2 group-hover:opacity-0"
               >
@@ -255,22 +293,19 @@ export default function ImageGallery({ projects }) {
               </button>
               <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 w-[180px]">
                 <h3 className="text-xs font-medium tracking-wider mb-1">
-                  {t(`${getAdjacentProject('prev').id}.title`)}
+                  {t(`${getAdjacentProject("prev").id}.title`)}
                 </h3>
                 <p className="text-[11px] font-light">
-                  {t(`${getAdjacentProject('prev').id}.description`)}
+                  {t(`${getAdjacentProject("prev").id}.description`)}
                 </p>
                 <span className="text-lg block mt-2">←</span>
               </div>
             </div>
           </div>
-          
-          {/* Next Arrow + Title - Desktop Only */}
+
+          {/* Next Arrow + Title (Desktop only) */}
           <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
-            <div 
-              className="relative pr-6 cursor-pointer w-full"
-              onClick={handleNext}
-            >
+            <div className="relative pr-6 cursor-pointer w-full" onClick={navigateToNext}>
               <button
                 className="w-10 h-10 flex items-center justify-center transition-all duration-300 absolute top-1/2 -translate-y-1/2 right-6 group-hover:opacity-0"
               >
@@ -278,42 +313,42 @@ export default function ImageGallery({ projects }) {
               </button>
               <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 text-right w-[180px]">
                 <h3 className="text-xs font-medium tracking-wider mb-1">
-                  {t(`${getAdjacentProject('next').id}.title`)}
+                  {t(`${getAdjacentProject("next").id}.title`)}
                 </h3>
                 <p className="text-[11px] font-light">
-                  {t(`${getAdjacentProject('next').id}.description`)}
+                  {t(`${getAdjacentProject("next").id}.description`)}
                 </p>
                 <span className="text-lg block mt-2">→</span>
               </div>
             </div>
           </div>
 
-          <div 
+          {/* MODAL CONTENT WRAPPER */}
+          <div
             className="relative w-full h-full flex flex-col items-center"
+            // Stop click propagation so clicking inside doesn't close the modal
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Project Info - Desktop Only */}
+            {/* Desktop Info */}
             <div className="hidden md:block w-full text-center -mt-2">
               <div className="w-full text-center bg-[#faf9f6]/80 py-1.5">
-                <h3 className="text-sm font-medium tracking-wider mb-0.5
-                  whitespace-nowrap
-                  text-[11px] md:text-xs
-                ">
+                <h3 className="text-[11px] md:text-xs font-medium tracking-wider mb-0.5 whitespace-nowrap">
                   {t(`${selectedImage.id}.title`)}
                 </h3>
-                <p className="text-xs font-light 
-                  whitespace-nowrap
-                  text-[10px] md:text-[11px]
-                ">
+                <p className="text-[10px] md:text-[11px] font-light whitespace-nowrap">
                   {t(`${selectedImage.id}.description`)}
                 </p>
               </div>
             </div>
 
-            {/* Image Container */}
-            <div className="relative w-full md:w-[1000px] lg:w-[1200px] xl:w-[1400px] 2xl:w-[1600px]
-              h-[calc(100vh-128px)] md:h-[calc(100vh-105px)]
-              mx-auto"
+            {/* IMAGE (with swipe handlers) */}
+            <div
+              className="relative w-full md:w-[1000px] lg:w-[1200px] xl:w-[1400px] 2xl:w-[1600px]
+                h-[calc(100vh-128px)] md:h-[calc(100vh-105px)]
+                mx-auto"
+              onTouchStart={onTouchStart}
+              onTouchMove={onTouchMove}
+              onTouchEnd={onTouchEnd}
             >
               <Image
                 src={selectedImage.imageUrl}
@@ -321,29 +356,29 @@ export default function ImageGallery({ projects }) {
                 fill
                 sizes="(max-width: 768px) 100vw, 80vw"
                 className="object-cover md:object-contain mx-auto"
-                style={{
-                  transform: `translateX(${-swipeProgress}px)`,
-                }}
+                style={{ transform: `translateX(${-swipeProgress}px)` }}
                 priority
                 quality={75}
                 loading="eager"
               />
             </div>
 
-            {/* Next/Prev Images for Transition */}
+            {/* Next/Prev Images for Swipe Transition */}
             {Math.abs(swipeProgress) > 0 && (
               <div className="absolute inset-0 h-[calc(100vh-128px)] md:h-[calc(100vh-80px)]">
                 <Image
-                  src={getAdjacentProject(swipeProgress > 0 ? 'next' : 'prev').imageUrl}
+                  src={getAdjacentProject(swipeProgress > 0 ? "next" : "prev").imageUrl}
                   alt=""
                   fill
                   sizes="100vw"
                   className="object-cover md:object-contain mx-auto"
                   style={{
-                    transform: `translateX(${swipeProgress > 0 ? 
-                      (window.innerWidth - swipeProgress) : 
-                      (-window.innerWidth - swipeProgress)}px)`,
-                    opacity: 1
+                    transform: `translateX(${
+                      swipeProgress > 0
+                        ? window.innerWidth - swipeProgress
+                        : -window.innerWidth - swipeProgress
+                    }px)`,
+                    opacity: 1,
                   }}
                   priority
                   quality={75}
@@ -351,90 +386,66 @@ export default function ImageGallery({ projects }) {
               </div>
             )}
 
-            {/* Mobile Info Container */}
+            {/* MOBILE CONTROLS + INFO */}
             <div className="fixed left-0 right-0 bottom-0 h-36 bg-[#faf9f6] flex flex-col justify-center items-center md:hidden">
-              {/* Swipe Indicator Dots */}
-              <div className="flex justify-center items-center overflow-visible h-8 mb-4">
-                {(() => {
-                  const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
-                  const totalDots = projects.length;
-                  const dotsToShow = 5;
-                  return Array.from({ length: dotsToShow }, (_, i) => {
-                    const centerOffset = i - Math.floor(dotsToShow / 2);
-                    let dotIndex = (currentIndex + centerOffset + totalDots) % totalDots;
-                    
-                    // Calculate relative position considering circular navigation
-                    const positionOffset = centerOffset;
-                    const swipeOffset = swipeProgress/window.innerWidth;
-                    
-                    const baseSize = 'h-2 w-2 mx-2';
-                    
-                    // Calculate scale with smoother transitions
-                    const maxScale = 1.4;
-                    const minScale = 0.6;
-                    
-                    // More dramatic scale reduction towards edges
-                    const scale = Math.max(
-                      minScale,
-                      maxScale - (Math.abs(positionOffset + swipeOffset) * 0.5)
-                    );
-                    
-                    // Smooth color transition
-                    const isActive = Math.abs(positionOffset + swipeOffset) < 0.5;
-                    const color = isActive ? '#ff3040' : '#d1d1d1';
-                    
-                    // Smooth opacity transition for edge dots
-                    const opacity = Math.max(0.3, 1 - Math.abs(positionOffset + swipeOffset));
-                    
-                    // Calculate horizontal movement
-                    const moveX = 0;
-                    
-                    return (
-                      <div
-                        key={dotIndex}
-                        className={`rounded-full transition-none ${baseSize}
-                          transform-gpu will-change-transform`}
-                        style={{
-                          transform: `translateX(${moveX}px) scale(${scale})`,
-                          backgroundColor: color,
-                          opacity: opacity,
-                          transition: 'none'
-                        }}
-                      />
-                    );
-                  });
-                })()}
-              </div>
+              <style>{swiperStyles}</style>
+              <Swiper
+                modules={[Pagination]}
+                pagination={{
+                  clickable: true,
+                  type: "bullets",
+                  dynamicBullets: true,
+                  dynamicMainBullets: 1,
+                }}
+                preventClicksPropagation={true}
+                preventClicks={true}
+                allowTouchMove={false}
+                onSwiper={(swiper) => {
+                  swiperRef.current = swiper;
+                  // Give time for Swiper to mount before jumping
+                  setTimeout(() => {
+                    const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
+                    swiper.slideToLoop(currentIndex, 0);
+                  }, 0);
+                }}
+                onSlideChange={(swiper) => {
+                  const newIndex = swiper.realIndex;
+                  setSelectedImage(projects[newIndex]);
+                }}
+                spaceBetween={50}
+                slidesPerView={1}
+                loop
+                loopedSlides={projects.length}
+                initialSlide={projects.findIndex((p) => p.id === selectedImage.id)}
+                centeredSlides
+                className="h-8 mb-4 w-full"
+              >
+                {projects.map((project, index) => (
+                  <SwiperSlide key={project.id}>
+                    {/* This empty content ensures each bullet is clickable */}
+                    <div className="text-center opacity-0 h-full">{index + 1}</div>
+                  </SwiperSlide>
+                ))}
+              </Swiper>
 
-              {/* Project Info - Mobile */}
               <div className="px-4 text-center">
                 <h3 className="text-sm font-medium tracking-wider mb-1">
                   {t(`${selectedImage.id}.title`)}
                 </h3>
-                <p className="text-xs font-light">
-                  {t(`${selectedImage.id}.description`)}
-                </p>
+                <p className="text-xs font-light">{t(`${selectedImage.id}.description`)}</p>
               </div>
             </div>
           </div>
         </div>
       )}
 
-      {/* Preload next and previous images */}
+      {/* PRELOAD NEXT AND PREVIOUS IMAGES */}
       {selectedImage && (
         <>
-          <link
-            rel="preload"
-            as="image"
-            href={getAdjacentProject('next').imageUrl}
-          />
-          <link
-            rel="preload"
-            as="image"
-            href={getAdjacentProject('prev').imageUrl}
-          />
+          <link rel="preload" as="image" href={getAdjacentProject("next").imageUrl} />
+          <link rel="preload" as="image" href={getAdjacentProject("prev").imageUrl} />
         </>
       )}
     </>
   );
-} 
+}
