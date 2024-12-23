@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 
 export default function ImageGallery({ projects }) {
   const t = useTranslations("projects");
+  const g = useTranslations("gallery");
   const router = useRouter();
   const [selectedImage, setSelectedImage] = useState(null);
   const [focusedImage, setFocusedImage] = useState(null);
@@ -27,25 +28,34 @@ export default function ImageGallery({ projects }) {
 
   // Simplified close handler
   const closeGallery = useCallback(() => {
-    // Destroy Swiper instance first
-    if (swiperRef.current) {
-      swiperRef.current.destroy(true, true);
-      swiperRef.current = null;
+    try {
+      // First reset states
+      setSelectedImage(null);
+      setIsGalleryOpen(false);
+      setSwipeProgress(0);
+      
+      // Reset body styles
+      document.body.style.overflow = 'unset';
+      document.body.style.position = 'static';
+      document.body.style.width = 'auto';
+      
+      // Destroy Swiper instance if it exists
+      if (swiperRef.current) {
+        swiperRef.current.destroy(true, true);
+        swiperRef.current = null;
+      }
+      
+      // Use setTimeout to ensure state updates complete before navigation
+      setTimeout(() => {
+        router.push('/');
+      }, 0);
+    } catch (error) {
+      console.error('Error in closeGallery:', error);
+      // Fallback close if something goes wrong
+      setSelectedImage(null);
+      setIsGalleryOpen(false);
     }
-    
-    // Then reset all states
-    setSelectedImage(null);
-    setIsGalleryOpen(false);
-    setSwipeProgress(0);
-    
-    // Reset body styles
-    document.body.style.overflow = 'unset';
-    document.body.style.position = 'static';
-    document.body.style.width = 'auto';
-    
-    // Finally navigate
-    router.push('/');
-  }, [setIsGalleryOpen, router]);
+  }, [router, setIsGalleryOpen]);
 
   // Remove the selectedImage effect and handle body styles directly
   useEffect(() => {
@@ -105,6 +115,15 @@ export default function ImageGallery({ projects }) {
     if (touchStart.current) {
       const progress = touchStart.current - e.targetTouches[0].clientX;
       setSwipeProgress(progress);
+      
+      // Show direction hint at boundaries with a minimum threshold
+      const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+      if ((currentIndex === 0 && progress < -20) || 
+          (currentIndex === projects.length - 1 && progress > 20)) {
+        setShowDirectionHint(currentIndex === 0 ? 'right' : 'left');
+      } else {
+        setShowDirectionHint(null);
+      }
     }
   };
 
@@ -118,12 +137,17 @@ export default function ImageGallery({ projects }) {
     // Reset progress first to prevent jump
     setSwipeProgress(0);
 
-    if (isLeftSwipe) {
+    const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+    
+    // Only navigate if we're not at the boundaries
+    if (isLeftSwipe && currentIndex < projects.length - 1) {
       navigateToNext();
     }
-    if (isRightSwipe) {
+    if (isRightSwipe && currentIndex > 0) {
       navigateToPrev();
     }
+
+    setShowDirectionHint(null); // Clear the hint
   };
 
   // NAVIGATION FUNCTIONS
@@ -216,6 +240,15 @@ export default function ImageGallery({ projects }) {
       height: 8px !important;
     }
   `;
+
+  // First add this new state near the other state declarations
+  const [showDirectionHint, setShowDirectionHint] = useState(null); // 'left' or 'right'
+
+  // First, calculate the hint opacity based on swipe progress
+  const getHintOpacity = useCallback((progress) => {
+    const maxProgress = window.innerWidth * 0.3; // 30% of screen width
+    return Math.min(Math.abs(progress) / maxProgress, 1);
+  }, []);
 
   return (
     <>
@@ -345,7 +378,7 @@ export default function ImageGallery({ projects }) {
             <div
               className="relative w-full md:w-[1000px] lg:w-[1200px] xl:w-[1400px] 2xl:w-[1600px]
                 h-[calc(100vh-128px)] md:h-[calc(100vh-105px)]
-                mx-auto"
+                mx-auto overflow-hidden"
               onTouchStart={onTouchStart}
               onTouchMove={onTouchMove}
               onTouchEnd={onTouchEnd}
@@ -366,23 +399,58 @@ export default function ImageGallery({ projects }) {
             {/* Next/Prev Images for Swipe Transition */}
             {Math.abs(swipeProgress) > 0 && (
               <div className="absolute inset-0 h-[calc(100vh-128px)] md:h-[calc(100vh-80px)]">
-                <Image
-                  src={getAdjacentProject(swipeProgress > 0 ? "next" : "prev").imageUrl}
-                  alt=""
-                  fill
-                  sizes="100vw"
-                  className="object-cover md:object-contain mx-auto"
-                  style={{
-                    transform: `translateX(${
-                      swipeProgress > 0
-                        ? window.innerWidth - swipeProgress
-                        : -window.innerWidth - swipeProgress
-                    }px)`,
-                    opacity: 1,
-                  }}
-                  priority
-                  quality={75}
-                />
+                {/* Only show transition image if we're not at the boundaries */}
+                {(() => {
+                  const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+                  const isFirst = currentIndex === 0;
+                  const isLast = currentIndex === projects.length - 1;
+                  
+                  // Don't show prev image if we're at first
+                  if (swipeProgress < 0 && isFirst) return null;
+                  // Don't show next image if we're at last
+                  if (swipeProgress > 0 && isLast) return null;
+
+                  return (
+                    <Image
+                      src={getAdjacentProject(swipeProgress > 0 ? "next" : "prev").imageUrl}
+                      alt=""
+                      fill
+                      sizes="100vw"
+                      className="object-cover md:object-contain mx-auto"
+                      style={{
+                        transform: `translateX(${
+                          swipeProgress > 0
+                            ? window.innerWidth - swipeProgress
+                            : -window.innerWidth - swipeProgress
+                        }px)`,
+                        opacity: 1,
+                      }}
+                      priority
+                      quality={75}
+                    />
+                  );
+                })()}
+              </div>
+            )}
+
+            {/* Direction Hint Arrow */}
+            {showDirectionHint && (
+              <div 
+                className="absolute inset-y-0 pointer-events-none flex items-center"
+                style={{
+                  ...(showDirectionHint === 'left' 
+                    ? { right: '20px' }  // Show on right when swiping from last
+                    : { left: '20px' })  // Show on left when swiping from first
+                }}
+              >
+                <span className={`text-5xl text-black/80 ${
+                  showDirectionHint === 'left' ? 'rotate-180' : ''
+                }`}
+                style={{
+                  opacity: Math.min(Math.abs(swipeProgress) / 50, 1)
+                }}>
+                  →
+                </span>
               </div>
             )}
 
@@ -402,27 +470,23 @@ export default function ImageGallery({ projects }) {
                 allowTouchMove={false}
                 onSwiper={(swiper) => {
                   swiperRef.current = swiper;
-                  // Give time for Swiper to mount before jumping
                   setTimeout(() => {
                     const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
-                    swiper.slideToLoop(currentIndex, 0);
+                    swiper.slideTo(currentIndex, 0);
                   }, 0);
                 }}
                 onSlideChange={(swiper) => {
-                  const newIndex = swiper.realIndex;
+                  const newIndex = swiper.activeIndex;
                   setSelectedImage(projects[newIndex]);
                 }}
                 spaceBetween={50}
                 slidesPerView={1}
-                loop
-                loopedSlides={projects.length}
+                loop={false}
                 initialSlide={projects.findIndex((p) => p.id === selectedImage.id)}
-                centeredSlides
                 className="h-8 mb-4 w-full"
               >
                 {projects.map((project, index) => (
                   <SwiperSlide key={project.id}>
-                    {/* This empty content ensures each bullet is clickable */}
                     <div className="text-center opacity-0 h-full">{index + 1}</div>
                   </SwiperSlide>
                 ))}

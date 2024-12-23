@@ -139,5 +139,11 @@
   "footer": {
     "rights": "Drets reservats.",
     "designed": "Dissenyat per guillegarciac"
+  },
+  "gallery": {
+    "swipeHints": {
+      "previous": "Llisca cap a l'esquerra per anar a l'anterior",
+      "next": "Llisca cap a la dreta per anar al següent"
+    }
   }
 } 

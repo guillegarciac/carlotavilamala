@@ -139,5 +139,11 @@
   "footer": {
     "rights": "Derechos reservados.",
     "designed": "Diseñado por guillegarciac"
+  },
+  "gallery": {
+    "swipeHints": {
+      "previous": "Desliza hacia la izquierda para ir al anterior",
+      "next": "Desliza hacia la derecha para ir al siguiente"
+    }
   }
 } 
