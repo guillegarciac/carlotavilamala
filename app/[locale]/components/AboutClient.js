@@ -16,7 +16,7 @@ export default function AboutClient() {
     <div className="md:max-h-screen">
       <Navigation />
 
-      <main className="px-8 mt-8 md:mt-8 pt-20 md:pt-16">
+      <main className="px-8 md:mt-8 pt-20 md:pt-16">
         <div className="max-w-screen-lg mx-auto">
           <div className="flex flex-col md:grid md:grid-cols-[200px_1fr] md:gap-x-24">
             {/* Bio Section */}
@@ -25,7 +25,7 @@ export default function AboutClient() {
                 {t('title')}
               </h2>
             </div>
-            <div className="mb-12 md:mb-16">
+            <div className="mb-6 md:mb-16">
               <p className="text-xs leading-relaxed font-light">
                 {t('bio')}
               </p>
