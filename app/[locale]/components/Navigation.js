@@ -9,6 +9,7 @@ import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGallery } from '../context/GalleryContext';
+import { useRouter } from 'next/navigation';
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -23,14 +24,18 @@ export default function Navigation() {
   const [isLoading, setIsLoading] = useState(true);
   const [showTitle, setShowTitle] = useState(false);
   const { isGalleryOpen, galleryTitle, closeGallery } = useGallery();
+  const router = useRouter();
 
-  // Show animation on page refresh but not on navigation
+  // Show animation on page refresh but not on navigation or language change
   useEffect(() => {
     const isNavigating = sessionStorage.getItem('isNavigating');
+    const isLanguageChange = sessionStorage.getItem('isLanguageChange');
     
-    if (isNavigating) {
+    if (isNavigating || isLanguageChange) {
       setIsLoading(false);
       setShowTitle(false);
+      // Clear language change flag after using it
+      sessionStorage.removeItem('isLanguageChange');
       return;
     }
     
@@ -74,6 +79,12 @@ export default function Navigation() {
       e.preventDefault();
       closeGallery();
     }
+  };
+
+  // Add this function to handle language changes
+  const handleLanguageChange = (newLocale) => {
+    sessionStorage.setItem('isLanguageChange', 'true');
+    router.push(pathname.replace(`/${locale}`, `/${newLocale}`));
   };
 
   return (

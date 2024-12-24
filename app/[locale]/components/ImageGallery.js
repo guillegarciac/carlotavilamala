@@ -101,6 +101,9 @@ export default function ImageGallery({ projects }) {
   // Add this state to track if auto-scroll has happened
   const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
 
+  // Add this state to track if we're touching the controls
+  const [isTouchingControls, setIsTouchingControls] = useState(false);
+
   // Modify the handleScroll function
   const handleScroll = useCallback((e) => {
     const scrollTop = e.target.scrollTop;
@@ -113,8 +116,8 @@ export default function ImageGallery({ projects }) {
       setGalleryTitle(null);
     }
 
-    // Only handle auto-scroll on mobile
-    if (isMobile) {
+    // Only handle auto-scroll on mobile and when touching controls
+    if (isMobile && isTouchingControls) {
       // Reset scroll indicator and auto-scroll when user returns to top
       if (scrollTop < 20) {
         setShowScrollIndicator(true);
@@ -134,7 +137,7 @@ export default function ImageGallery({ projects }) {
         }
       }
     }
-  }, [selectedImage, t, setGalleryTitle, hasAutoScrolled]);
+  }, [selectedImage, t, setGalleryTitle, hasAutoScrolled, isTouchingControls]);
 
   // Reset hasAutoScrolled when selectedImage changes
   useEffect(() => {
@@ -538,7 +541,11 @@ export default function ImageGallery({ projects }) {
               </div>
 
               {/* MOBILE CONTROLS + INFO - Single container */}
-              <div className="w-screen bg-[#faf9f6] flex flex-col md:hidden relative z-[500] h-36">
+              <div 
+                className="w-screen bg-[#faf9f6] flex flex-col md:hidden relative z-[500] h-36 -mt-36"
+                onTouchStart={() => setIsTouchingControls(true)}
+                onTouchEnd={() => setIsTouchingControls(false)}
+              >
                 {/* Dots and Title in one container */}
                 <div className="flex flex-col h-full pt-2">
                   {/* Dots at the top */}
