@@ -424,7 +424,7 @@ export default function ImageGallery({ projects }) {
           {/* Modal Content */}
           <div 
             ref={modalRef}
-            className="fixed inset-0 md:top-[80px] bg-primary md:z-40 overflow-y-auto overscroll-none"
+            className="fixed inset-0 md:top-[85px] bg-primary md:z-40 overflow-y-auto overscroll-none"
             onScroll={handleScroll}
             style={{ 
               overscrollBehavior: 'none',
