@@ -117,19 +117,22 @@ export default function Navigation() {
         ${isGalleryOpen ? 'md:flex hidden' : 'flex'}
         py-4 md:py-6 pt-8 md:pt-4`}>
         {/* Mobile Menu */}
-        <div className="w-16">
+        <div className="md:hidden absolute left-0">
           <MobileMenu currentPath={pathname} />
         </div>
 
-        {/* Logo/Project Title */}
-        <Link 
-          href={`/${locale}`} 
-          className={`${playfair.className} tracking-[0.2em] transition-colors
-            text-sm md:text-lg lg:text-xl text-primary`}
-          onClick={closeGallery}
-        >
-          CARLOTA VILAMALA
-        </Link>
+        {/* Logo/Project Title Container */}
+        <div className="flex-1 md:flex-initial flex justify-center">
+          <Link 
+            href={`/${locale}`} 
+            className={`${playfair.className} tracking-[0.2em] transition-colors whitespace-nowrap
+              text-sm md:text-lg lg:text-xl text-primary
+              ${isLoading ? 'opacity-0' : 'opacity-100'}`}
+            onClick={closeGallery}
+          >
+            CARLOTA VILAMALA
+          </Link>
+        </div>
 
         {/* Desktop Menu */}
         <div className={`hidden md:flex gap-8 text-xs absolute left-8 tracking-wider
