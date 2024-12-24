@@ -9,6 +9,74 @@ import { Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { useRouter } from "next/navigation";
+import { useInView } from 'react-intersection-observer';
+
+// Create a separate ProjectItem component to handle individual projects
+const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, focusedImage }) => {
+  const [ref, inView] = useInView({
+    threshold: 0,
+    triggerOnce: true
+  });
+
+  useEffect(() => {
+    if (inView) {
+      preloadProjectImages(project);
+    }
+  }, [inView, project, preloadProjectImages]);
+
+  const setRefs = useCallback(
+    (element) => {
+      ref(element);
+      projectRefs.current.set(project.id, element);
+    },
+    [ref, project.id, projectRefs]
+  );
+
+  return (
+    <div
+      key={project.id}
+      ref={setRefs}
+      data-project-id={project.id}
+      className="group cursor-pointer"
+      onClick={() => onSelect(project)}
+    >
+      <div className="relative overflow-hidden aspect-[3/4]">
+        <Image
+          src={project.imageUrl}
+          alt={t(`${project.id}.title`)}
+          fill
+          sizes="(max-width: 768px) 100vw, 
+                 (max-width: 1024px) 33vw,
+                 (max-width: 1280px) 25vw,
+                 20vw"
+          className="object-cover transition-all duration-700 group-hover:scale-[1.02]"
+          priority={project.id <= 8}
+          quality={75}
+          loading={project.id <= 8 ? "eager" : "lazy"}
+        />
+        <div
+          className={`absolute inset-0 transition-colors duration-300
+            md:bg-black/0 md:group-hover:bg-black/40
+            ${focusedImage === project.id ? "bg-black/40" : "bg-black/0"}`}
+        >
+          <div
+            className={`absolute inset-0 flex flex-col items-center justify-center 
+              transition-opacity duration-300 text-white text-center p-4
+              md:opacity-0 md:group-hover:opacity-100
+              ${focusedImage === project.id ? "opacity-100" : "opacity-0"}`}
+          >
+            <h3 className="text-lg font-medium tracking-wider mb-2 transform transition-transform duration-300">
+              {t(`${project.id}.title`)}
+            </h3>
+            <p className="text-sm font-light transform transition-transform duration-300">
+              {t(`${project.id}.description`)}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function ImageGallery({ projects }) {
   const t = useTranslations("projects");
@@ -17,7 +85,7 @@ export default function ImageGallery({ projects }) {
   const [selectedImage, setSelectedImage] = useState(null);
   const [focusedImage, setFocusedImage] = useState(null);
   const [swipeProgress, setSwipeProgress] = useState(0);
-  const { setIsGalleryOpen } = useGallery();
+  const { setIsGalleryOpen, setGalleryTitle } = useGallery();
   const projectRefs = useRef(new Map());
   const swiperRef = useRef(null);
 
@@ -25,6 +93,19 @@ export default function ImageGallery({ projects }) {
   const touchStart = useRef(null);
   const touchEnd = useRef(null);
   const [minSwipeDistance, setMinSwipeDistance] = useState(0);
+
+  // Add this near other state declarations
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  // Add this function to handle scroll
+  const handleScroll = useCallback((e) => {
+    const scrollTop = e.target.scrollTop;
+    if (scrollTop > 100) {
+      setGalleryTitle(t(`${selectedImage.id}.title`));
+    } else {
+      setGalleryTitle(null);
+    }
+  }, [selectedImage, t, setGalleryTitle]);
 
   // Simplified close handler
   const closeGallery = useCallback(() => {
@@ -64,6 +145,8 @@ export default function ImageGallery({ projects }) {
       document.body.style.position = 'fixed';
       document.body.style.width = '100%';
       setIsGalleryOpen(true);
+      // Initialize gallery title based on scroll position
+      setGalleryTitle(null);
     }
     
     return () => {
@@ -71,8 +154,9 @@ export default function ImageGallery({ projects }) {
       document.body.style.position = 'static';
       document.body.style.width = 'auto';
       setIsGalleryOpen(false);
+      setGalleryTitle(null);
     };
-  }, [selectedImage, setIsGalleryOpen]);
+  }, [selectedImage, setIsGalleryOpen, setGalleryTitle]);
 
   // INTERSECTION OBSERVER (mobile only)
   useEffect(() => {
@@ -250,64 +334,81 @@ export default function ImageGallery({ projects }) {
     return Math.min(Math.abs(progress) / maxProgress, 1);
   }, []);
 
+  // Add this function inside ImageGallery component
+  const preloadImage = (src) => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = resolve;
+      img.onerror = reject;
+    });
+  };
+
+  // Add this near other state declarations
+  const [loadedProjects, setLoadedProjects] = useState(new Set());
+
+  // Add this function to handle preloading of detail images
+  const preloadProjectImages = useCallback(async (project) => {
+    if (!project || loadedProjects.has(project.id)) return;
+
+    try {
+      // Check if project has detail images
+      if (project.detailImages && project.detailImages.length > 0) {
+        await Promise.all(
+          project.detailImages.map(imagePath => 
+            preloadImage(imagePath).catch(err => 
+              console.warn(`Failed to preload image ${imagePath}:`, err)
+            )
+          )
+        );
+        setLoadedProjects(prev => new Set([...prev, project.id]));
+      }
+    } catch (error) {
+      console.error(`Error preloading images for project ${project.id}:`, error);
+    }
+  }, [loadedProjects]);
+
+  // Add this effect near other useEffects
+  useEffect(() => {
+    if (selectedImage) {
+      // Preload current project's detail images
+      preloadProjectImages(selectedImage);
+      
+      // Preload next project's detail images
+      const nextProject = getAdjacentProject("next");
+      preloadProjectImages(nextProject);
+      
+      // Preload previous project's detail images
+      const prevProject = getAdjacentProject("prev");
+      preloadProjectImages(prevProject);
+    }
+  }, [selectedImage, getAdjacentProject, preloadProjectImages]);
+
   return (
     <>
       {/* GALLERY GRID */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 -mt-4">
         {projects.map((project) => (
-          <div
+          <ProjectItem
             key={project.id}
-            ref={(el) => projectRefs.current.set(project.id, el)}
-            data-project-id={project.id}
-            className="group cursor-pointer"
-            onClick={() => setSelectedImage(project)}
-          >
-            <div className="relative overflow-hidden aspect-[3/4]">
-              <Image
-                src={project.imageUrl}
-                alt={t(`${project.id}.title`)}
-                fill
-                sizes="(max-width: 768px) 100vw, 
-                       (max-width: 1024px) 33vw,
-                       (max-width: 1280px) 25vw,
-                       20vw"
-                className="object-cover transition-all duration-700 group-hover:scale-[1.02]"
-                priority={project.id <= 8}
-                quality={75}
-                loading={project.id <= 8 ? "eager" : "lazy"}
-              />
-              <div
-                className={`absolute inset-0 transition-colors duration-300
-                  md:bg-black/0 md:group-hover:bg-black/40
-                  ${focusedImage === project.id ? "bg-black/40" : "bg-black/0"}`}
-              >
-                <div
-                  className={`absolute inset-0 flex flex-col items-center justify-center 
-                    transition-opacity duration-300 text-white text-center p-4
-                    md:opacity-0 md:group-hover:opacity-100
-                    ${focusedImage === project.id ? "opacity-100" : "opacity-0"}`}
-                >
-                  <h3 className="text-lg font-medium tracking-wider mb-2 transform transition-transform duration-300">
-                    {t(`${project.id}.title`)}
-                  </h3>
-                  <p className="text-sm font-light transform transition-transform duration-300">
-                    {t(`${project.id}.description`)}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+            project={project}
+            onSelect={setSelectedImage}
+            t={t}
+            preloadProjectImages={preloadProjectImages}
+            projectRefs={projectRefs}
+            focusedImage={focusedImage}
+          />
         ))}
       </div>
 
       {/* LIGHTBOX / MODAL */}
       {selectedImage && (
-        <div className="fixed inset-0 md:top-[80px] bg-[#faf9f6] z-[200] md:z-50">
+        <>
           {/* Close Button */}
           <button
-            className="absolute top-6 right-6 z-[201] block 
-              md:bg-transparent md:shadow-none bg-white rounded-full shadow-md
-              w-8 h-8 flex items-center justify-center"
+            className="fixed md:top-[100px] top-6 right-[24px] md:right-[120px] lg:right-[60px] z-[9999] block 
+              bg-white md:bg-transparent rounded-full shadow-md md:shadow-none
+              w-8 h-8 flex items-center justify-center hover:opacity-70 transition-opacity"
             onClick={closeGallery}
           >
             <div className="w-4 h-4 flex flex-col justify-center relative">
@@ -316,191 +417,209 @@ export default function ImageGallery({ projects }) {
             </div>
           </button>
 
-          {/* Prev Arrow + Title (Desktop only) */}
-          <div className="absolute left-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
-            <div className="relative pl-6 cursor-pointer w-full" onClick={navigateToPrev}>
-              <button
-                className="w-10 h-10 flex items-center justify-center transition-all duration-300 absolute top-1/2 -translate-y-1/2 group-hover:opacity-0"
-              >
-                <span className="text-3xl">←</span>
-              </button>
-              <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 w-[180px]">
-                <h3 className="text-xs font-medium tracking-wider mb-1">
-                  {t(`${getAdjacentProject("prev").id}.title`)}
-                </h3>
-                <p className="text-[11px] font-light">
-                  {t(`${getAdjacentProject("prev").id}.description`)}
-                </p>
-                <span className="text-lg block mt-2">←</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Next Arrow + Title (Desktop only) */}
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
-            <div className="relative pr-6 cursor-pointer w-full" onClick={navigateToNext}>
-              <button
-                className="w-10 h-10 flex items-center justify-center transition-all duration-300 absolute top-1/2 -translate-y-1/2 right-6 group-hover:opacity-0"
-              >
-                <span className="text-3xl">→</span>
-              </button>
-              <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 text-right w-[180px]">
-                <h3 className="text-xs font-medium tracking-wider mb-1">
-                  {t(`${getAdjacentProject("next").id}.title`)}
-                </h3>
-                <p className="text-[11px] font-light">
-                  {t(`${getAdjacentProject("next").id}.description`)}
-                </p>
-                <span className="text-lg block mt-2">→</span>
-              </div>
-            </div>
-          </div>
-
-          {/* MODAL CONTENT WRAPPER */}
-          <div
-            className="relative w-full h-full flex flex-col items-center"
-            // Stop click propagation so clicking inside doesn't close the modal
-            onClick={(e) => e.stopPropagation()}
+          {/* Modal Content */}
+          <div 
+            className="fixed inset-0 md:top-[80px] bg-[#faf9f6] z-[200] md:z-50 overflow-y-auto"
+            onScroll={handleScroll}
+            onTouchStart={onTouchStart}
+            onTouchMove={onTouchMove}
+            onTouchEnd={onTouchEnd}
           >
-            {/* Desktop Info */}
-            <div className="hidden md:block w-full text-center -mt-2">
-              <div className="w-full text-center bg-[#faf9f6]/80 py-1.5">
-                <h3 className="text-[11px] md:text-xs font-medium tracking-wider mb-0.5 whitespace-nowrap">
-                  {t(`${selectedImage.id}.title`)}
-                </h3>
-                <p className="text-[10px] md:text-[11px] font-light whitespace-nowrap">
-                  {t(`${selectedImage.id}.description`)}
-                </p>
+            <div className="relative w-full min-h-full flex flex-col items-center">
+              {/* Desktop Info */}
+              <div className="hidden md:block w-full text-center -mt-2">
+                <div className="w-full text-center bg-[#faf9f6]/80 py-1.5">
+                  <h3 className="text-[11px] md:text-xs font-medium tracking-wider mb-0.5 whitespace-nowrap">
+                    {t(`${selectedImage.id}.title`)}
+                  </h3>
+                  <p className="text-[10px] md:text-[11px] font-light whitespace-nowrap">
+                    {t(`${selectedImage.id}.description`)}
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* IMAGE (with swipe handlers) */}
-            <div
-              className="relative w-full md:w-[1000px] lg:w-[1200px] xl:w-[1400px] 2xl:w-[1600px]
-                h-[calc(100vh-128px)] md:h-[calc(100vh-105px)]
-                mx-auto overflow-hidden"
-              onTouchStart={onTouchStart}
-              onTouchMove={onTouchMove}
-              onTouchEnd={onTouchEnd}
-            >
-              <Image
-                src={selectedImage.imageUrl}
-                alt={t(`${selectedImage.id}.title`)}
-                fill
-                sizes="(max-width: 768px) 100vw, 80vw"
-                className="object-cover md:object-contain mx-auto"
-                style={{ transform: `translateX(${-swipeProgress}px)` }}
-                priority
-                quality={75}
-                loading="eager"
-              />
-            </div>
+              {/* Main Image Container with Navigation Arrows */}
+              <div className="relative w-full md:w-[800px] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px] px-24 md:px-[120px] lg:px-[160px] mx-auto">
+                {/* Prev Arrow + Title (Desktop only) */}
+                <div className="fixed left-6 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
+                  <div className="relative pl-6 cursor-pointer w-full" onClick={navigateToPrev}>
+                    <button
+                      className="w-10 h-10 flex items-center justify-center transition-all duration-300 absolute top-1/2 -translate-y-1/2 group-hover:opacity-0"
+                    >
+                      <span className="text-3xl">←</span>
+                    </button>
+                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 w-[180px]">
+                      <h3 className="text-xs font-medium tracking-wider mb-1">
+                        {t(`${getAdjacentProject("prev").id}.title`)}
+                      </h3>
+                      <p className="text-[11px] font-light">
+                        {t(`${getAdjacentProject("prev").id}.description`)}
+                      </p>
+                      <span className="text-lg block mt-2">←</span>
+                    </div>
+                  </div>
+                </div>
 
-            {/* Next/Prev Images for Swipe Transition */}
-            {Math.abs(swipeProgress) > 0 && (
-              <div className="absolute inset-0 h-[calc(100vh-128px)] md:h-[calc(100vh-80px)]">
-                {/* Only show transition image if we're not at the boundaries */}
-                {(() => {
-                  const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
-                  const isFirst = currentIndex === 0;
-                  const isLast = currentIndex === projects.length - 1;
-                  
-                  // Don't show prev image if we're at first
-                  if (swipeProgress < 0 && isFirst) return null;
-                  // Don't show next image if we're at last
-                  if (swipeProgress > 0 && isLast) return null;
+                {/* Next Arrow + Title (Desktop only) */}
+                <div className="fixed right-6 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
+                  <div className="relative pr-6 cursor-pointer w-full" onClick={navigateToNext}>
+                    <button
+                      className="w-10 h-10 flex items-center justify-center transition-all duration-300 absolute top-1/2 -translate-y-1/2 right-6 group-hover:opacity-0"
+                    >
+                      <span className="text-3xl">→</span>
+                    </button>
+                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 text-right w-[180px]">
+                      <h3 className="text-xs font-medium tracking-wider mb-1">
+                        {t(`${getAdjacentProject("next").id}.title`)}
+                      </h3>
+                      <p className="text-[11px] font-light">
+                        {t(`${getAdjacentProject("next").id}.description`)}
+                      </p>
+                      <span className="text-lg block mt-2">→</span>
+                    </div>
+                  </div>
+                </div>
 
-                  return (
-                    <Image
-                      src={getAdjacentProject(swipeProgress > 0 ? "next" : "prev").imageUrl}
-                      alt=""
-                      fill
-                      sizes="100vw"
-                      className="object-cover md:object-contain mx-auto"
-                      style={{
-                        transform: `translateX(${
-                          swipeProgress > 0
-                            ? window.innerWidth - swipeProgress
-                            : -window.innerWidth - swipeProgress
-                        }px)`,
-                        opacity: 1,
-                      }}
-                      priority
-                      quality={75}
-                    />
-                  );
-                })()}
+                {/* Main Project Image */}
+                <div className="h-[calc(100vh-128px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden">
+                  <Image
+                    src={selectedImage.imageUrl}
+                    alt={t(`${selectedImage.id}.title`)}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 80vw"
+                    className="object-cover md:object-contain mx-auto"
+                    style={{ transform: `translateX(${-swipeProgress}px)` }}
+                    priority
+                    quality={75}
+                  />
+                </div>
               </div>
-            )}
 
-            {/* Direction Hint Arrow */}
-            {showDirectionHint && (
-              <div 
-                className="absolute inset-y-0 pointer-events-none flex items-center"
-                style={{
-                  ...(showDirectionHint === 'left' 
-                    ? { right: '20px' }  // Show on right when swiping from last
-                    : { left: '20px' })  // Show on left when swiping from first
-                }}
-              >
-                <span className={`text-5xl text-black/80 ${
-                  showDirectionHint === 'left' ? 'rotate-180' : ''
-                }`}
-                style={{
-                  opacity: Math.min(Math.abs(swipeProgress) / 50, 1)
-                }}>
-                  →
-                </span>
-              </div>
-            )}
+              {/* Next/Prev Images for Swipe Transition */}
+              {Math.abs(swipeProgress) > 0 && (
+                <div className="fixed inset-0 top-0 md:top-[80px] z-[-1]">
+                  {(() => {
+                    const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+                    const isFirst = currentIndex === 0;
+                    const isLast = currentIndex === projects.length - 1;
+                    
+                    if (swipeProgress < 0 && isFirst) return null;
+                    if (swipeProgress > 0 && isLast) return null;
 
-            {/* MOBILE CONTROLS + INFO */}
-            <div className="fixed left-0 right-0 bottom-0 h-36 bg-[#faf9f6] flex flex-col justify-center items-center md:hidden">
-              <style>{swiperStyles}</style>
-              <Swiper
-                modules={[Pagination]}
-                pagination={{
-                  clickable: true,
-                  type: "bullets",
-                  dynamicBullets: true,
-                  dynamicMainBullets: 1,
-                }}
-                preventClicksPropagation={true}
-                preventClicks={true}
-                allowTouchMove={false}
-                onSwiper={(swiper) => {
-                  swiperRef.current = swiper;
-                  setTimeout(() => {
-                    const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
-                    swiper.slideTo(currentIndex, 0);
-                  }, 0);
-                }}
-                onSlideChange={(swiper) => {
-                  const newIndex = swiper.activeIndex;
-                  setSelectedImage(projects[newIndex]);
-                }}
-                spaceBetween={50}
-                slidesPerView={1}
-                loop={false}
-                initialSlide={projects.findIndex((p) => p.id === selectedImage.id)}
-                className="h-8 mb-4 w-full"
-              >
-                {projects.map((project, index) => (
-                  <SwiperSlide key={project.id}>
-                    <div className="text-center opacity-0 h-full">{index + 1}</div>
-                  </SwiperSlide>
-                ))}
-              </Swiper>
+                    return (
+                      <Image
+                        src={getAdjacentProject(swipeProgress > 0 ? "next" : "prev").imageUrl}
+                        alt=""
+                        fill
+                        sizes="100vw"
+                        className="object-cover md:object-contain mx-auto"
+                        style={{
+                          transform: `translateX(${
+                            swipeProgress > 0
+                              ? window.innerWidth - swipeProgress
+                              : -window.innerWidth - swipeProgress
+                          }px)`,
+                          opacity: 1,
+                        }}
+                        priority
+                        quality={75}
+                      />
+                    );
+                  })()}
+                </div>
+              )}
 
-              <div className="px-4 text-center">
-                <h3 className="text-sm font-medium tracking-wider mb-1">
-                  {t(`${selectedImage.id}.title`)}
-                </h3>
-                <p className="text-xs font-light">{t(`${selectedImage.id}.description`)}</p>
+              {/* Direction Hint Arrow */}
+              {showDirectionHint && (
+                <div 
+                  className="fixed inset-y-0 top-0 md:top-[80px] pointer-events-none flex items-center z-[201]"
+                  style={{
+                    ...(showDirectionHint === 'left' 
+                      ? { right: '20px' }
+                      : { left: '20px' })
+                  }}
+                >
+                  <span 
+                    className={`text-5xl text-black/80 ${showDirectionHint === 'left' ? 'rotate-180' : ''}`}
+                    style={{
+                      opacity: Math.min(Math.abs(swipeProgress) / 50, 1)
+                    }}
+                  >
+                    →
+                  </span>
+                </div>
+              )}
+
+              {/* Detail Images Gallery */}
+              {selectedImage.detailImages && selectedImage.detailImages.length > 0 && (
+                <div className="w-full overflow-y-auto mt-8 pb-48 md:pb-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 
+                    w-[80%] md:w-[800px] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px] 
+                    mx-auto px-0 md:px-[120px] lg:px-[160px]">
+                    {selectedImage.detailImages.map((imagePath, index) => (
+                      <div key={index} className="relative aspect-[3/4]">
+                        <Image
+                          src={imagePath}
+                          alt={`${t(`${selectedImage.id}.title`)} - Detail ${index + 1}`}
+                          fill
+                          sizes="(max-width: 768px) 80vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover"
+                          quality={75}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* MOBILE CONTROLS + INFO */}
+              <div className="fixed left-0 right-0 bottom-0 h-36 bg-[#faf9f6] flex flex-col justify-center items-center md:hidden">
+                <style>{swiperStyles}</style>
+                <Swiper
+                  modules={[Pagination]}
+                  pagination={{
+                    clickable: true,
+                    type: "bullets",
+                    dynamicBullets: true,
+                    dynamicMainBullets: 1,
+                  }}
+                  preventClicksPropagation={true}
+                  preventClicks={true}
+                  allowTouchMove={false}
+                  onSwiper={(swiper) => {
+                    swiperRef.current = swiper;
+                    setTimeout(() => {
+                      const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
+                      swiper.slideTo(currentIndex, 0);
+                    }, 0);
+                  }}
+                  onSlideChange={(swiper) => {
+                    const newIndex = swiper.activeIndex;
+                    setSelectedImage(projects[newIndex]);
+                  }}
+                  spaceBetween={50}
+                  slidesPerView={1}
+                  loop={false}
+                  initialSlide={projects.findIndex((p) => p.id === selectedImage.id)}
+                  className="h-8 mb-4 w-full"
+                >
+                  {projects.map((project, index) => (
+                    <SwiperSlide key={project.id}>
+                      <div className="text-center opacity-0 h-full">{index + 1}</div>
+                    </SwiperSlide>
+                  ))}
+                </Swiper>
+
+                <div className="px-4 text-center">
+                  <h3 className="text-sm font-medium tracking-wider mb-1">
+                    {t(`${selectedImage.id}.title`)}
+                  </h3>
+                  <p className="text-xs font-light">{t(`${selectedImage.id}.description`)}</p>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        </>
       )}
 
       {/* PRELOAD NEXT AND PREVIOUS IMAGES */}

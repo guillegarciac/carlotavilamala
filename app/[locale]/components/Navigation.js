@@ -22,7 +22,7 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showTitle, setShowTitle] = useState(false);
-  const { isGalleryOpen } = useGallery();
+  const { isGalleryOpen, galleryTitle } = useGallery();
 
   // Show animation on page refresh but not on navigation
   useEffect(() => {
@@ -120,14 +120,22 @@ export default function Navigation() {
           </Link>
         </div>
 
-        {/* Logo */}
+        {/* Logo/Project Title */}
         <Link 
           href={`/${locale}`} 
           className={`text-base tracking-[0.2em] ${playfair.className} ml-8 md:ml-0 transition-all duration-[1200ms]
             text-base md:${isScrolled ? 'text-lg' : 'text-xl'}
             ${!isLoading ? 'opacity-100' : 'opacity-0'}`}
         >
-          CARLOTA VILAMALA
+          {isGalleryOpen && galleryTitle ? (
+            <span className="transition-opacity duration-300">
+              {galleryTitle}
+            </span>
+          ) : (
+            <span className="transition-opacity duration-300">
+              CARLOTA VILAMALA
+            </span>
+          )}
         </Link>
 
         {/* Social Icons and Language Selector */}
