@@ -1,7 +1,8 @@
 "use client";
 
 import { Playfair_Display } from "next/font/google";
-import { FaInstagram, FaLinkedin, FaSun, FaMoon } from "react-icons/fa";
+import { FaInstagram, FaLinkedin } from "react-icons/fa";
+import { LuSun, LuMoon } from "react-icons/lu";
 import MobileMenu from "./MobileMenu";
 import LanguageSelector from "./LanguageSelector";
 import Link from "next/link";
@@ -181,7 +182,7 @@ export default function Navigation() {
             className="hover:opacity-50 transition-opacity ml-4"
             aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
           >
-            {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+            {isDarkMode ? <LuSun size={20} /> : <LuMoon size={20} />}
           </button>
         </div>
       </nav>

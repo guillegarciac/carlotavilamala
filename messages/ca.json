@@ -3,7 +3,9 @@
     "projects": "PROJECTES",
     "about": "SOBRE MI",
     "contact": "CONTACTE",
-    "subtitle": "Estilista de Moda i Direcció Creativa"
+    "subtitle": "Estilista de Moda i Direcció Creativa",
+    "lightTheme": "TEMA CLAR",
+    "darkTheme": "TEMA FOSC"
   },
   "about": {
     "title": "BIO",

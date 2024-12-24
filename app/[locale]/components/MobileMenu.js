@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
+import { LuSun, LuMoon } from "react-icons/lu";
 import Link from "next/link";
 import LanguageSelector from "./LanguageSelector";
 import { useTranslations, useLocale } from 'next-intl';
@@ -11,7 +12,7 @@ export default function MobileMenu({ currentPath }) {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations('navigation');
   const locale = useLocale();
-  const { isDarkMode } = useTheme();
+  const { isDarkMode, toggleTheme } = useTheme();
   const isHomePage = currentPath === `/${locale}` || currentPath === `/${locale}/`;
 
   return (
@@ -78,6 +79,12 @@ export default function MobileMenu({ currentPath }) {
                   >
                     <FaLinkedin size={20} />
                   </a>
+                  <button
+                    onClick={toggleTheme}
+                    className="text-primary hover:text-accent transition-colors"
+                  >
+                    {isDarkMode ? <LuSun size={20} /> : <LuMoon size={20} />}
+                  </button>
                 </div>
               </div>
             </nav>

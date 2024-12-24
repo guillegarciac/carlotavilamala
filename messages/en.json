@@ -3,7 +3,9 @@
     "projects": "PROJECTS",
     "about": "ABOUT ME",
     "contact": "CONTACT",
-    "subtitle": "Fashion Stylist and Creative Direction"
+    "subtitle": "Fashion Stylist and Creative Direction",
+    "lightTheme": "LIGHT THEME",
+    "darkTheme": "DARK THEME"
   },
   "about": {
     "title": "BIO",
