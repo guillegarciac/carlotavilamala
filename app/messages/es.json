@@ -1,0 +1,20 @@
+{
+  "navigation": {
+    "home": "Inicio",
+    "about": "Sobre mí",
+    "contact": "Contacto"
+  },
+  "about": {
+    "title": "Bio",
+    "bio": "Tu texto de biografía en español aquí",
+    "bio2": "Texto adicional de biografía en español aquí",
+    "clients": {
+      "title": "Clientes",
+      "list": {
+        "1": "Cliente 1",
+        "2": "Cliente 2",
+        "3": "Cliente 3"
+      }
+    }
+  }
+} 
