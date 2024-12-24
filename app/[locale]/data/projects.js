@@ -1,6 +1,6 @@
 import { getAllProjectImages } from '../utils/projectImages';
 
-// Get all project detail images at build time
+// Get all project detail images at build time.
 const projectDetailImages = getAllProjectImages();
 
 export const projects = [
