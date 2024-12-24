@@ -439,9 +439,12 @@ export default function ImageGallery({ projects }) {
           {/* Modal Content */}
           <div 
             ref={modalRef}
-            className="fixed inset-0 md:top-[80px] bg-[#faf9f6] md:z-40 overflow-y-auto overscroll-none touch-pan-y"
+            className="fixed inset-0 md:top-[80px] bg-[#faf9f6] md:z-40 overflow-y-auto overscroll-none"
             onScroll={handleScroll}
-            style={{ overscrollBehavior: 'none' }}
+            style={{ 
+              overscrollBehavior: 'none',
+              touchAction: 'pan-y pinch-zoom'
+            }}
           >
             <div className="relative w-full min-h-screen flex flex-col items-center">
               {/* Desktop Info */}
@@ -500,7 +503,7 @@ export default function ImageGallery({ projects }) {
 
                 {/* Main Project Image */}
                 <div 
-                  className="h-[calc(100vh-80px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden"
+                  className="h-[calc(100vh-80px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden touch-none md:touch-auto"
                   onTouchStart={onTouchStart}
                   onTouchMove={onTouchMove}
                   onTouchEnd={onTouchEnd}
@@ -510,7 +513,7 @@ export default function ImageGallery({ projects }) {
                     alt={t(`${selectedImage.id}.title`)}
                     fill
                     sizes="(max-width: 768px) 100vw, 80vw"
-                    className="object-cover md:object-contain mx-auto"
+                    className="object-cover md:object-contain mx-auto pointer-events-none md:pointer-events-auto"
                     style={{ transform: `translateX(${-swipeProgress}px)` }}
                     priority
                     quality={75}
@@ -519,7 +522,7 @@ export default function ImageGallery({ projects }) {
               </div>
 
               {/* MOBILE CONTROLS + INFO - Single container */}
-              <div className="w-screen bg-[#faf9f6] flex flex-col md:hidden relative z-[500] h-36 -mt-36">
+              <div className="w-screen bg-[#faf9f6] flex flex-col md:hidden relative z-[500] h-36 -mt-36 touch-auto">
                 {/* Dots and Title in one container */}
                 <div className="flex flex-col h-full pt-2">
                   {/* Dots at the top */}
