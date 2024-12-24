@@ -10,6 +10,8 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { useRouter } from "next/navigation";
 import { useInView } from 'react-intersection-observer';
+import { IoIosArrowDown } from "react-icons/io";
+import Footer from "./Footer";
 
 // Create a separate ProjectItem component to handle individual projects
 const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, focusedImage }) => {
@@ -82,10 +84,9 @@ export default function ImageGallery({ projects }) {
   const t = useTranslations("projects");
   const g = useTranslations("gallery");
   const router = useRouter();
-  const [selectedImage, setSelectedImage] = useState(null);
+  const { selectedImage, setSelectedImage, setIsGalleryOpen, setGalleryTitle } = useGallery();
   const [focusedImage, setFocusedImage] = useState(null);
   const [swipeProgress, setSwipeProgress] = useState(0);
-  const { setIsGalleryOpen, setGalleryTitle } = useGallery();
   const projectRefs = useRef(new Map());
   const swiperRef = useRef(null);
 
@@ -97,15 +98,49 @@ export default function ImageGallery({ projects }) {
   // Add this near other state declarations
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Add this function to handle scroll
+  // Add this state to track if auto-scroll has happened
+  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
+
+  // Modify the handleScroll function
   const handleScroll = useCallback((e) => {
     const scrollTop = e.target.scrollTop;
+    const isMobile = window.innerWidth < 768;
+    
+    // Handle title change
     if (scrollTop > 100) {
       setGalleryTitle(t(`${selectedImage.id}.title`));
     } else {
       setGalleryTitle(null);
     }
-  }, [selectedImage, t, setGalleryTitle]);
+
+    // Only handle auto-scroll on mobile
+    if (isMobile) {
+      // Reset scroll indicator and auto-scroll when user returns to top
+      if (scrollTop < 20) {
+        setShowScrollIndicator(true);
+        setHasAutoScrolled(false);
+      }
+      // Hide scroll indicator and trigger auto-scroll only once
+      else if (scrollTop > 20 && !hasAutoScrolled) {
+        setShowScrollIndicator(false);
+        
+        // Auto-scroll to content (mobile only)
+        if (modalRef.current) {
+          modalRef.current.scrollTo({
+            top: window.innerHeight,
+            behavior: 'smooth'
+          });
+          setHasAutoScrolled(true);
+        }
+      }
+    }
+  }, [selectedImage, t, setGalleryTitle, hasAutoScrolled]);
+
+  // Reset hasAutoScrolled when selectedImage changes
+  useEffect(() => {
+    setHasAutoScrolled(false);
+    setShowScrollIndicator(true);
+  }, [selectedImage]);
 
   // Simplified close handler
   const closeGallery = useCallback(() => {
@@ -384,6 +419,10 @@ export default function ImageGallery({ projects }) {
     }
   }, [selectedImage, getAdjacentProject, preloadProjectImages]);
 
+  // Add these state declarations near the other states
+  const [showScrollIndicator, setShowScrollIndicator] = useState(true);
+  const modalRef = useRef(null);
+
   return (
     <>
       {/* GALLERY GRID */}
@@ -406,7 +445,7 @@ export default function ImageGallery({ projects }) {
         <>
           {/* Close Button */}
           <button
-            className="fixed md:top-[100px] top-6 right-[24px] md:right-[120px] lg:right-[60px] z-[9999] block 
+            className="fixed md:top-[140px] top-6 right-[24px] md:right-[120px] lg:right-[60px] z-[9999] block 
               bg-white md:bg-transparent rounded-full shadow-md md:shadow-none
               w-8 h-8 flex items-center justify-center hover:opacity-70 transition-opacity"
             onClick={closeGallery}
@@ -419,13 +458,11 @@ export default function ImageGallery({ projects }) {
 
           {/* Modal Content */}
           <div 
-            className="fixed inset-0 md:top-[80px] bg-[#faf9f6] z-[200] md:z-50 overflow-y-auto"
+            ref={modalRef}
+            className="fixed inset-0 md:top-[80px] bg-[#faf9f6] md:z-40 overflow-y-auto"
             onScroll={handleScroll}
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
           >
-            <div className="relative w-full min-h-full flex flex-col items-center">
+            <div className="relative w-full min-h-screen flex flex-col items-center">
               {/* Desktop Info */}
               <div className="hidden md:block w-full text-center -mt-2">
                 <div className="w-full text-center bg-[#faf9f6]/80 py-1.5">
@@ -481,7 +518,12 @@ export default function ImageGallery({ projects }) {
                 </div>
 
                 {/* Main Project Image */}
-                <div className="h-[calc(100vh-128px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden">
+                <div 
+                  className="h-[calc(100vh-128px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden"
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
+                >
                   <Image
                     src={selectedImage.imageUrl}
                     alt={t(`${selectedImage.id}.title`)}
@@ -492,6 +534,71 @@ export default function ImageGallery({ projects }) {
                     priority
                     quality={75}
                   />
+                </div>
+              </div>
+
+              {/* MOBILE CONTROLS + INFO - Single container */}
+              <div className="w-screen bg-[#faf9f6] flex flex-col md:hidden relative z-[500] h-36">
+                {/* Dots and Title in one container */}
+                <div className="flex flex-col h-full pt-2">
+                  {/* Dots at the top */}
+                  <div>
+                    <style>{swiperStyles}</style>
+                    <Swiper
+                      modules={[Pagination]}
+                      pagination={{
+                        clickable: true,
+                        type: "bullets",
+                        dynamicBullets: true,
+                        dynamicMainBullets: 1,
+                      }}
+                      preventClicksPropagation={true}
+                      preventClicks={true}
+                      allowTouchMove={false}
+                      onSwiper={(swiper) => {
+                        swiperRef.current = swiper;
+                        setTimeout(() => {
+                          const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
+                          swiper.slideTo(currentIndex, 0);
+                        }, 0);
+                      }}
+                      onSlideChange={(swiper) => {
+                        const newIndex = swiper.activeIndex;
+                        setSelectedImage(projects[newIndex]);
+                      }}
+                      spaceBetween={50}
+                      slidesPerView={1}
+                      loop={false}
+                      initialSlide={projects.findIndex((p) => p.id === selectedImage.id)}
+                      className="h-6 w-full"
+                    >
+                      {projects.map((project, index) => (
+                        <SwiperSlide key={project.id}>
+                          <div className="text-center opacity-0 h-full">{index + 1}</div>
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
+                  </div>
+
+                  {/* Title closer to dots */}
+                  <div className="mt-1">
+                    <div className="px-4 text-center">
+                      <h3 className="text-sm font-medium tracking-wider mb-1">
+                        {t(`${selectedImage.id}.title`)}
+                      </h3>
+                      <p className="text-xs font-light mb-2">{t(`${selectedImage.id}.description`)}</p>
+                      
+                      {/* Scroll indicator centered below year */}
+                      {showScrollIndicator && selectedImage.detailImages?.length > 0 && (
+                        <div className="flex justify-center items-center mt-2">
+                          <IoIosArrowDown 
+                            size={14} 
+                            className="text-black animate-bounce"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -552,10 +659,12 @@ export default function ImageGallery({ projects }) {
 
               {/* Detail Images Gallery */}
               {selectedImage.detailImages && selectedImage.detailImages.length > 0 && (
-                <div className="w-full overflow-y-auto mt-8 pb-48 md:pb-8">
+                <div className="w-full overflow-y-auto mt-0 md:mt-[80px]">
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 
                     w-[80%] md:w-[800px] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px] 
-                    mx-auto px-0 md:px-[120px] lg:px-[160px]">
+                    mx-auto px-0 md:px-[120px] lg:px-[160px]
+                    pb-8 md:pb-12"
+                  >
                     {selectedImage.detailImages.map((imagePath, index) => (
                       <div key={index} className="relative aspect-[3/4]">
                         <Image
@@ -572,50 +681,9 @@ export default function ImageGallery({ projects }) {
                 </div>
               )}
 
-              {/* MOBILE CONTROLS + INFO */}
-              <div className="fixed left-0 right-0 bottom-0 h-36 bg-[#faf9f6] flex flex-col justify-center items-center md:hidden">
-                <style>{swiperStyles}</style>
-                <Swiper
-                  modules={[Pagination]}
-                  pagination={{
-                    clickable: true,
-                    type: "bullets",
-                    dynamicBullets: true,
-                    dynamicMainBullets: 1,
-                  }}
-                  preventClicksPropagation={true}
-                  preventClicks={true}
-                  allowTouchMove={false}
-                  onSwiper={(swiper) => {
-                    swiperRef.current = swiper;
-                    setTimeout(() => {
-                      const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
-                      swiper.slideTo(currentIndex, 0);
-                    }, 0);
-                  }}
-                  onSlideChange={(swiper) => {
-                    const newIndex = swiper.activeIndex;
-                    setSelectedImage(projects[newIndex]);
-                  }}
-                  spaceBetween={50}
-                  slidesPerView={1}
-                  loop={false}
-                  initialSlide={projects.findIndex((p) => p.id === selectedImage.id)}
-                  className="h-8 mb-4 w-full"
-                >
-                  {projects.map((project, index) => (
-                    <SwiperSlide key={project.id}>
-                      <div className="text-center opacity-0 h-full">{index + 1}</div>
-                    </SwiperSlide>
-                  ))}
-                </Swiper>
-
-                <div className="px-4 text-center">
-                  <h3 className="text-sm font-medium tracking-wider mb-1">
-                    {t(`${selectedImage.id}.title`)}
-                  </h3>
-                  <p className="text-xs font-light">{t(`${selectedImage.id}.description`)}</p>
-                </div>
+              {/* Footer */}
+              <div className="hidden md:block w-full px-8">
+                <Footer variant="simple" />
               </div>
             </div>
           </div>

@@ -22,7 +22,7 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showTitle, setShowTitle] = useState(false);
-  const { isGalleryOpen, galleryTitle } = useGallery();
+  const { isGalleryOpen, galleryTitle, closeGallery } = useGallery();
 
   // Show animation on page refresh but not on navigation
   useEffect(() => {
@@ -68,6 +68,14 @@ export default function Navigation() {
   // Helper function to check if it's the home page
   const isHomePage = pathname === `/${locale}` || pathname === `/${locale}/`;
 
+  // Add this handler for the Projects link
+  const handleProjectsClick = (e) => {
+    if (isGalleryOpen) {
+      e.preventDefault();
+      closeGallery();
+    }
+  };
+
   return (
     <>
       {/* Loading Overlay with Centered Title */}
@@ -92,8 +100,7 @@ export default function Navigation() {
 
       <nav className={`fixed top-0 left-0 right-0 flex justify-center items-center px-8 bg-[#faf9f6] z-50 transition-all duration-[1200ms]
         ${isGalleryOpen ? 'md:flex hidden' : 'flex'}
-        py-4 md:${isScrolled ? 'py-3' : 'py-6'}
-      `}>
+        py-4 md:py-6 pt-8 md:pt-4`}>
         {/* Mobile Menu */}
         <MobileMenu currentPath={pathname} />
 
@@ -103,6 +110,7 @@ export default function Navigation() {
           <Link 
             href={`/${locale}`}
             className={`nav-link ${isHomePage ? 'text-red-500' : ''}`}
+            onClick={handleProjectsClick}
           >
             {t('projects')}
           </Link>
