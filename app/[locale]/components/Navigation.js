@@ -97,9 +97,9 @@ export default function Navigation() {
       <div 
         className={`fixed inset-0 bg-primary z-[60] pointer-events-none flex flex-col items-center 
           justify-center md:justify-center px-8 -mt-12 md:mt-0
-          ${isLoading ? 'opacity-100' : 'opacity-0'}`}
+          transition-opacity duration-700 ${isLoading ? 'opacity-100' : 'opacity-0'}`}
       >
-        <div className={`flex flex-col items-center
+        <div className={`flex flex-col items-center transition-all duration-700
           ${!showTitle ? '-translate-y-12 opacity-0 scale-[1.1]' : ''}
           ${showTitle && isLoading ? 'translate-y-0 opacity-100 scale-100' : ''}
           ${showTitle && !isLoading ? '-translate-y-24 opacity-0 scale-[0.6]' : ''}`}
