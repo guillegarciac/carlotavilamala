@@ -98,16 +98,9 @@ export default function ImageGallery({ projects }) {
   // Add this near other state declarations
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Add this state to track if auto-scroll has happened
-  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
-
-  // Add this state to track if we're touching the controls
-  const [isTouchingControls, setIsTouchingControls] = useState(false);
-
-  // Modify the handleScroll function
+  // Simplify the handleScroll function to only handle title change
   const handleScroll = useCallback((e) => {
     const scrollTop = e.target.scrollTop;
-    const isMobile = window.innerWidth < 768;
     
     // Handle title change
     if (scrollTop > 100) {
@@ -116,32 +109,16 @@ export default function ImageGallery({ projects }) {
       setGalleryTitle(null);
     }
 
-    // Only handle auto-scroll on mobile and when touching controls
-    if (isMobile && isTouchingControls) {
-      // Reset scroll indicator and auto-scroll when user returns to top
-      if (scrollTop < 20) {
-        setShowScrollIndicator(true);
-        setHasAutoScrolled(false);
-      }
-      // Hide scroll indicator and trigger auto-scroll only once
-      else if (scrollTop > 20 && !hasAutoScrolled) {
-        setShowScrollIndicator(false);
-        
-        // Auto-scroll to content (mobile only)
-        if (modalRef.current) {
-          modalRef.current.scrollTo({
-            top: window.innerHeight,
-            behavior: 'smooth'
-          });
-          setHasAutoScrolled(true);
-        }
-      }
+    // Hide scroll indicator after user starts scrolling
+    if (scrollTop > 20) {
+      setShowScrollIndicator(false);
+    } else {
+      setShowScrollIndicator(true);
     }
-  }, [selectedImage, t, setGalleryTitle, hasAutoScrolled, isTouchingControls]);
+  }, [selectedImage, t, setGalleryTitle]);
 
-  // Reset hasAutoScrolled when selectedImage changes
+  // Instead, just reset the scroll indicator when image changes
   useEffect(() => {
-    setHasAutoScrolled(false);
     setShowScrollIndicator(true);
   }, [selectedImage]);
 
@@ -462,8 +439,9 @@ export default function ImageGallery({ projects }) {
           {/* Modal Content */}
           <div 
             ref={modalRef}
-            className="fixed inset-0 md:top-[80px] bg-[#faf9f6] md:z-40 overflow-y-auto"
+            className="fixed inset-0 md:top-[80px] bg-[#faf9f6] md:z-40 overflow-y-auto overscroll-none touch-pan-y"
             onScroll={handleScroll}
+            style={{ overscrollBehavior: 'none' }}
           >
             <div className="relative w-full min-h-screen flex flex-col items-center">
               {/* Desktop Info */}
@@ -522,7 +500,7 @@ export default function ImageGallery({ projects }) {
 
                 {/* Main Project Image */}
                 <div 
-                  className="h-[calc(100vh-128px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden"
+                  className="h-[calc(100vh-80px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden"
                   onTouchStart={onTouchStart}
                   onTouchMove={onTouchMove}
                   onTouchEnd={onTouchEnd}
@@ -541,11 +519,7 @@ export default function ImageGallery({ projects }) {
               </div>
 
               {/* MOBILE CONTROLS + INFO - Single container */}
-              <div 
-                className="w-screen bg-[#faf9f6] flex flex-col md:hidden relative z-[500] h-36 -mt-36"
-                onTouchStart={() => setIsTouchingControls(true)}
-                onTouchEnd={() => setIsTouchingControls(false)}
-              >
+              <div className="w-screen bg-[#faf9f6] flex flex-col md:hidden relative z-[500] h-36 -mt-36">
                 {/* Dots and Title in one container */}
                 <div className="flex flex-col h-full pt-2">
                   {/* Dots at the top */}
