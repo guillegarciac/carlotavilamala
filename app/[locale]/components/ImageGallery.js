@@ -11,7 +11,9 @@ import "swiper/css/pagination";
 import { useRouter } from "next/navigation";
 import { useInView } from 'react-intersection-observer';
 import { IoIosArrowDown } from "react-icons/io";
+import { IoClose } from "react-icons/io5";
 import Footer from "./Footer";
+import { useTheme } from '../context/ThemeContext';
 
 // Create a separate ProjectItem component to handle individual projects
 const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, focusedImage }) => {
@@ -309,34 +311,12 @@ export default function ImageGallery({ projects }) {
   // Swiper pagination bullet styles
   const swiperStyles = `
     .swiper-pagination-bullet {
-      transition: all 0.3s ease;
-      background: #8E8E8E;
-      opacity: 0.4;
+      background: var(--text-primary);
+      opacity: 0.2;
     }
     .swiper-pagination-bullet-active {
-      background: #EF4444 !important;
+      background: var(--accent-color);
       opacity: 1;
-      width: 16px !important;
-      height: 16px !important;
-    }
-    .swiper-pagination-bullet-active-prev,
-    .swiper-pagination-bullet-active-next {
-      width: 14px !important;
-      height: 14px !important;
-    }
-    .swiper-pagination-bullet-active-prev-prev,
-    .swiper-pagination-bullet-active-next-next {
-      width: 12px !important;
-      height: 12px !important;
-    }
-    .swiper-pagination-bullet-active-prev-prev-prev,
-    .swiper-pagination-bullet-active-next-next-next {
-      width: 10px !important;
-      height: 10px !important;
-    }
-    .swiper-pagination-bullet {
-      width: 8px !important;
-      height: 8px !important;
     }
   `;
 
@@ -403,6 +383,8 @@ export default function ImageGallery({ projects }) {
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
   const modalRef = useRef(null);
 
+  const { isDarkMode } = useTheme();
+
   return (
     <>
       {/* GALLERY GRID */}
@@ -424,22 +406,25 @@ export default function ImageGallery({ projects }) {
       {selectedImage && (
         <>
           {/* Close Button */}
-          <button
-            className="fixed md:top-[140px] top-6 right-[24px] md:right-[120px] lg:right-[60px] z-[9999] block 
-              bg-white md:bg-transparent rounded-full shadow-md md:shadow-none
-              w-8 h-8 flex items-center justify-center hover:opacity-70 transition-opacity"
+          <button 
             onClick={closeGallery}
+            className={`fixed top-4 right-4 z-50 w-8 h-8 flex items-center justify-center 
+              ${isDarkMode 
+                ? 'bg-black hover:bg-black/80' 
+                : 'bg-white hover:bg-white/80'} 
+              rounded-full transition-colors shadow-md`}
+            aria-label="Close gallery"
           >
-            <div className="w-4 h-4 flex flex-col justify-center relative">
-              <span className="w-full h-[1.5px] bg-black absolute rotate-45" />
-              <span className="w-full h-[1.5px] bg-black absolute -rotate-45" />
-            </div>
+            <IoClose 
+              size={20} 
+              className={isDarkMode ? 'text-white' : 'text-black'} 
+            />
           </button>
 
           {/* Modal Content */}
           <div 
             ref={modalRef}
-            className="fixed inset-0 md:top-[80px] bg-[#faf9f6] md:z-40 overflow-y-auto overscroll-none"
+            className="fixed inset-0 md:top-[80px] bg-primary md:z-40 overflow-y-auto overscroll-none"
             onScroll={handleScroll}
             style={{ 
               overscrollBehavior: 'none',
@@ -449,11 +434,11 @@ export default function ImageGallery({ projects }) {
             <div className="relative w-full min-h-screen flex flex-col items-center">
               {/* Desktop Info */}
               <div className="hidden md:block w-full text-center -mt-2">
-                <div className="w-full text-center bg-[#faf9f6]/80 py-1.5">
-                  <h3 className="text-[11px] md:text-xs font-medium tracking-wider mb-0.5 whitespace-nowrap">
+                <div className="w-full text-center bg-primary/80 py-1.5">
+                  <h3 className="text-[11px] md:text-xs font-medium tracking-wider mb-0.5 whitespace-nowrap text-primary">
                     {t(`${selectedImage.id}.title`)}
                   </h3>
-                  <p className="text-[10px] md:text-[11px] font-light whitespace-nowrap">
+                  <p className="text-[10px] md:text-[11px] font-light whitespace-nowrap text-primary">
                     {t(`${selectedImage.id}.description`)}
                   </p>
                 </div>
@@ -522,7 +507,7 @@ export default function ImageGallery({ projects }) {
               </div>
 
               {/* MOBILE CONTROLS + INFO - Single container */}
-              <div className="w-screen bg-[#faf9f6] flex flex-col md:hidden relative z-[500] h-36 -mt-36 touch-auto">
+              <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] h-36 -mt-36 touch-auto">
                 {/* Dots and Title in one container */}
                 <div className="flex flex-col h-full pt-2">
                   {/* Dots at the top */}
@@ -577,7 +562,7 @@ export default function ImageGallery({ projects }) {
                         <div className="flex justify-center items-center mt-2">
                           <IoIosArrowDown 
                             size={14} 
-                            className="text-black animate-bounce"
+                            className={`animate-bounce ${isDarkMode ? 'text-white' : 'text-black'}`}
                           />
                         </div>
                       )}

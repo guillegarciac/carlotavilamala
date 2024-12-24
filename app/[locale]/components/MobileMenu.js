@@ -5,54 +5,56 @@ import { FaInstagram, FaLinkedin } from "react-icons/fa";
 import Link from "next/link";
 import LanguageSelector from "./LanguageSelector";
 import { useTranslations, useLocale } from 'next-intl';
+import { useTheme } from '../context/ThemeContext';
 
 export default function MobileMenu({ currentPath }) {
   const [isOpen, setIsOpen] = useState(false);
   const t = useTranslations('navigation');
   const locale = useLocale();
-
-  // Helper function to check if it's the home page
+  const { isDarkMode } = useTheme();
   const isHomePage = currentPath === `/${locale}` || currentPath === `/${locale}/`;
 
   return (
     <div className="md:hidden absolute left-0">
       {/* Burger/X Button */}
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center h-full px-8 z-50 relative"
+        className="flex items-center h-full px-8 z-50 relative -mt-2"
       >
         <div className="w-8 h-5 flex flex-col justify-center relative">
-          <span className={`w-full h-[1px] bg-black absolute transition-all duration-300 ${
-            isOpen ? 'rotate-45' : '-translate-y-1'
-          }`} />
-          <span className={`w-full h-[1px] bg-black absolute transition-all duration-300 ${
-            isOpen ? '-rotate-45' : 'translate-y-1'
-          }`} />
+          <span className={`w-full h-[1px] absolute transition-all duration-300 -translate-y-1
+            ${isDarkMode ? 'bg-white' : 'bg-black'}`}
+            style={{ transform: isOpen ? 'rotate(45deg) translate(0)' : '' }}
+          />
+          <span className={`w-full h-[1px] absolute transition-all duration-300 translate-y-1
+            ${isDarkMode ? 'bg-white' : 'bg-black'}`}
+            style={{ transform: isOpen ? 'rotate(-45deg) translate(0)' : '' }}
+          />
         </div>
       </button>
 
       {/* Mobile Menu Overlay */}
       {isOpen && (
-        <div className="fixed inset-0 bg-[#faf9f6] z-40">
+        <div className="fixed inset-0 bg-primary z-40">
           <div className="p-8">
             <nav className="flex flex-col gap-8 mt-16 text-sm">
               <Link 
                 href={`/${locale}`}
-                className={isHomePage ? 'text-red-500' : ''}
+                className={isHomePage ? 'text-accent' : 'text-primary'}
                 onClick={() => setIsOpen(false)}
               >
                 {t('projects')}
               </Link>
               <Link 
                 href={`/${locale}/about`}
-                className={currentPath.includes('/about') ? 'text-red-500' : ''}
+                className={currentPath.includes('/about') ? 'text-accent' : 'text-primary'}
                 onClick={() => setIsOpen(false)}
               >
                 {t('about')}
               </Link>
               <Link 
                 href={`/${locale}/contact`}
-                className={currentPath.includes('/contact') ? 'text-red-500' : ''}
+                className={currentPath.includes('/contact') ? 'text-accent' : 'text-primary'}
                 onClick={() => setIsOpen(false)}
               >
                 {t('contact')}
@@ -64,17 +66,17 @@ export default function MobileMenu({ currentPath }) {
                     href="https://instagram.com/bycharlott_" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center"
+                    className="text-primary hover:text-accent transition-colors"
                   >
-                    <FaInstagram size={24} />
+                    <FaInstagram size={20} />
                   </a>
                   <a 
                     href="https://www.linkedin.com/in/carlota-vilamala-reig/" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="flex items-center"
+                    className="text-primary hover:text-accent transition-colors"
                   >
-                    <FaLinkedin size={24} />
+                    <FaLinkedin size={20} />
                   </a>
                 </div>
               </div>

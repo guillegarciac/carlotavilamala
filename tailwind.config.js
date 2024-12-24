@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class',
   content: [
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -9,6 +10,17 @@ module.exports = {
       colors: {
         background: "var(--background)",
         foreground: "var(--foreground)",
+      },
+      backgroundColor: {
+        primary: 'var(--background-primary)',
+        secondary: 'var(--background-secondary)',
+        form: 'var(--form-background)',
+        input: 'var(--input-bg)',
+      },
+      textColor: {
+        primary: 'var(--text-primary)',
+        secondary: 'var(--text-secondary)',
+        accent: 'var(--accent-color)',
       },
       screens: {
         'landscape': {'raw': '(orientation: landscape)'},
@@ -32,7 +44,13 @@ module.exports = {
       animation: {
         fadeIn: 'fadeIn 800ms ease-out forwards',
         bounce: 'bounce 1s infinite',
-      }
+      },
+      borderColor: {
+        primary: 'var(--text-primary)',
+      },
+      borderOpacity: {
+        input: 'var(--input-border-opacity)',
+      },
     },
   },
   plugins: [],

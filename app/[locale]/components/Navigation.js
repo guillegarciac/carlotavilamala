@@ -1,7 +1,7 @@
 "use client";
 
 import { Playfair_Display } from "next/font/google";
-import { FaInstagram, FaLinkedin } from "react-icons/fa";
+import { FaInstagram, FaLinkedin, FaSun, FaMoon } from "react-icons/fa";
 import MobileMenu from "./MobileMenu";
 import LanguageSelector from "./LanguageSelector";
 import Link from "next/link";
@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useGallery } from '../context/GalleryContext';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '../context/ThemeContext';
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -25,6 +26,8 @@ export default function Navigation() {
   const [showTitle, setShowTitle] = useState(false);
   const { isGalleryOpen, galleryTitle, closeGallery } = useGallery();
   const router = useRouter();
+  const { isDarkMode, toggleTheme } = useTheme();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   // Show animation on page refresh but not on navigation or language change
   useEffect(() => {
@@ -91,11 +94,11 @@ export default function Navigation() {
     <>
       {/* Loading Overlay with Centered Title */}
       <div 
-        className={`fixed inset-0 bg-[#faf9f6] z-[60] transition-all duration-[1200ms] pointer-events-none flex flex-col items-center 
+        className={`fixed inset-0 bg-primary z-[60] pointer-events-none flex flex-col items-center 
           justify-center md:justify-center px-8 -mt-12 md:mt-0
           ${isLoading ? 'opacity-100' : 'opacity-0'}`}
       >
-        <div className={`flex flex-col items-center transition-all duration-[1200ms]
+        <div className={`flex flex-col items-center
           ${!showTitle ? '-translate-y-12 opacity-0 scale-[1.1]' : ''}
           ${showTitle && isLoading ? 'translate-y-0 opacity-100 scale-100' : ''}
           ${showTitle && !isLoading ? '-translate-y-24 opacity-0 scale-[0.6]' : ''}`}
@@ -109,57 +112,51 @@ export default function Navigation() {
         </div>
       </div>
 
-      <nav className={`fixed top-0 left-0 right-0 flex justify-center items-center px-8 bg-[#faf9f6] z-50 transition-all duration-[1200ms]
+      <nav className={`fixed top-0 left-0 right-0 flex justify-center items-center px-8 bg-primary z-50
         ${isGalleryOpen ? 'md:flex hidden' : 'flex'}
         py-4 md:py-6 pt-8 md:pt-4`}>
         {/* Mobile Menu */}
-        <MobileMenu currentPath={pathname} />
+        <div className="w-16">
+          <MobileMenu currentPath={pathname} />
+        </div>
+
+        {/* Logo/Project Title */}
+        <Link 
+          href={`/${locale}`} 
+          className={`${playfair.className} tracking-[0.2em] transition-colors
+            text-sm md:text-lg lg:text-xl text-primary`}
+          onClick={closeGallery}
+        >
+          CARLOTA VILAMALA
+        </Link>
 
         {/* Desktop Menu */}
-        <div className={`hidden md:flex gap-8 text-xs absolute left-8 tracking-wider transition-opacity duration-[1200ms] delay-300
+        <div className={`hidden md:flex gap-8 text-xs absolute left-8 tracking-wider
           ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
           <Link 
             href={`/${locale}`}
-            className={`nav-link ${isHomePage ? 'text-red-500' : ''}`}
+            className={`nav-link ${isHomePage ? 'text-accent' : 'text-primary'}`}
             onClick={handleProjectsClick}
           >
             {t('projects')}
           </Link>
           <Link 
             href={`/${locale}/about`}
-            className={`nav-link ${pathname.includes('/about') ? 'text-red-500' : ''}`}
+            className={`nav-link ${pathname.includes('/about') ? 'text-accent' : ''}`}
           >
             {t('about')}
           </Link>
           <Link 
             href={`/${locale}/contact`}
-            className={`nav-link ${pathname.includes('/contact') ? 'text-red-500' : ''}`}
+            className={`nav-link ${pathname.includes('/contact') ? 'text-accent' : ''}`}
           >
             {t('contact')}
           </Link>
         </div>
 
-        {/* Logo/Project Title */}
-        <Link 
-          href={`/${locale}`} 
-          className={`text-base tracking-[0.2em] ${playfair.className} ml-8 md:ml-0 transition-all duration-[1200ms]
-            text-base md:${isScrolled ? 'text-lg' : 'text-xl'}
-            ${!isLoading ? 'opacity-100' : 'opacity-0'}`}
-        >
-          {isGalleryOpen && galleryTitle ? (
-            <span className="transition-opacity duration-300">
-              {galleryTitle}
-            </span>
-          ) : (
-            <span className="transition-opacity duration-300">
-              CARLOTA VILAMALA
-            </span>
-          )}
-        </Link>
-
         {/* Social Icons and Language Selector */}
-        <div className={`hidden md:flex items-center gap-6 absolute right-8 transition-all duration-[1200ms] delay-300
-          ${isLoading ? 'opacity-0 translate-y-4' : 'opacity-100 translate-y-0'}`}>
+        <div className={`hidden md:flex items-center gap-6 absolute right-8
+          ${isLoading ? 'opacity-0' : 'opacity-100'}`}>
           <LanguageSelector />
           <div className="flex gap-4">
             <a 
@@ -168,7 +165,7 @@ export default function Navigation() {
               target="_blank" 
               rel="noopener noreferrer"
             >
-              <FaInstagram size={isScrolled ? 18 : 20} className="transition-all duration-300 hidden md:block" />
+              <FaInstagram size={20} className="hidden md:block text-primary" />
             </a>
             <a 
               href="https://www.linkedin.com/in/carlota-vilamala-reig/" 
@@ -176,9 +173,16 @@ export default function Navigation() {
               target="_blank" 
               rel="noopener noreferrer"
             >
-              <FaLinkedin size={isScrolled ? 18 : 20} className="transition-all duration-300 hidden md:block" />
+              <FaLinkedin size={20} className="hidden md:block text-primary" />
             </a>
           </div>
+          <button
+            onClick={toggleTheme}
+            className="hover:opacity-50 transition-opacity ml-4"
+            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {isDarkMode ? <FaSun size={20} /> : <FaMoon size={20} />}
+          </button>
         </div>
       </nav>
     </>

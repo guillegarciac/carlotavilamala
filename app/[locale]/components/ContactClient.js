@@ -8,6 +8,7 @@ import { Toaster, toast } from 'react-hot-toast';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
 import { IoSend } from "react-icons/io5";
+import { useTheme } from '../context/ThemeContext';
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
@@ -21,6 +22,7 @@ export default function ContactClient() {
   const locale = useLocale();
   const router = useRouter();
   const [isFormValid, setIsFormValid] = useState(false);
+  const { isDarkMode } = useTheme();
 
   useEffect(() => {
     // Hide footer when contact page is mounted
@@ -139,8 +141,8 @@ export default function ContactClient() {
                 name="name"
                 placeholder={t('form.name')}
                 required
-                className="w-full border-b border-black/20 py-3 px-0 text-base 
-                  bg-[#faf9f6] focus:outline-none focus:border-black/40 
+                className="w-full border-b border-primary/input py-3 px-0 text-base 
+                  bg-transparent focus:outline-none focus:border-primary 
                   transition-colors touch-manipulation"
               />
             </div>
@@ -151,8 +153,8 @@ export default function ContactClient() {
                 name="email"
                 placeholder={t('form.email')}
                 required
-                className="w-full border-b border-black/20 py-3 px-0 text-base 
-                  bg-[#faf9f6] focus:outline-none focus:border-black/40 
+                className="w-full border-b border-primary/input py-3 px-0 text-base 
+                  bg-transparent focus:outline-none focus:border-primary 
                   transition-colors touch-manipulation"
               />
             </div>
@@ -162,23 +164,25 @@ export default function ContactClient() {
                 name="message"
                 placeholder={t('form.message')}
                 required
-                className="w-full h-full border-b border-black/20 py-3 px-0 text-base 
-                  bg-[#faf9f6] focus:outline-none focus:border-black/40 
+                className="w-full h-full border-b border-primary/input py-3 px-0 text-base 
+                  bg-transparent focus:outline-none focus:border-primary 
                   transition-colors resize-none touch-manipulation"
               />
             </div>
           </form>
         </div>
 
-        <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#faf9f6] border-t">
+        <div className="fixed bottom-0 left-0 right-0 p-4 bg-primary border-t border-primary/input">
           <button
             type="submit"
             form="contact-form"
             disabled={sending}
             className={`w-full py-3 transition-all text-sm flex items-center justify-center gap-2
               ${isFormValid 
-                ? 'bg-red-500 hover:bg-red-600 text-white' 
-                : 'bg-[#faf9f6] border border-black hover:bg-black hover:text-white'
+                ? isDarkMode
+                  ? 'bg-[#d4af37] hover:bg-[#d4af37]/90 text-white'  // Gold for dark mode
+                  : 'bg-[#ef4444] hover:bg-[#ef4444]/90 text-white'   // Red for light mode
+                : 'bg-transparent border border-primary text-primary hover:bg-accent hover:border-accent hover:text-white'
               } 
               disabled:opacity-50`}
           >

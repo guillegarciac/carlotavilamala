@@ -5,11 +5,31 @@
 :root {
   --background: #faf9f6;
   --foreground: #000000;
+  --background-primary: #faf9f6;
+  --background-secondary: #ffffff;
+  --text-primary: #000000;
+  --text-secondary: #666666;
+  --accent-color: #ef4444; /* red-500 */
+  --form-background: #faf9f6;
+  --input-bg: #faf9f6;
+  --input-border-opacity: 0.2;
+}
+
+.dark {
+  --background: #1a1a1a;
+  --foreground: #ffffff;
+  --background-primary: #1a1a1a;
+  --background-secondary: #2d2d2d;
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --accent-color: #d4af37; /* gold */
+  --form-background: #1a1a1a;
+  --input-bg: transparent;
+  --input-border-opacity: 0.4;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
+  @apply bg-primary text-primary;
 }
 
 @layer components {

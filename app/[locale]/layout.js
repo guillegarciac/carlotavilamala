@@ -5,6 +5,7 @@ import { unstable_setRequestLocale } from 'next-intl/server';
 import "../globals.css";
 import Footer from './components/Footer';
 import { GalleryProvider } from './context/GalleryContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -22,21 +23,42 @@ export default async function LocaleLayout({ children, params: { locale } }) {
   }
 
   return (
-    <html lang={locale}>
+    <html lang={locale} suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var savedTheme = localStorage.getItem('theme');
+                  if (savedTheme) {
+                    document.documentElement.classList.toggle('dark', savedTheme === 'dark');
+                  } else {
+                    var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                    document.documentElement.classList.toggle('dark', systemPrefersDark);
+                    localStorage.setItem('theme', systemPrefersDark ? 'dark' : 'light');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <link rel="icon" href="/favicon.ico" />
         <meta 
           name="viewport" 
           content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
         />
+        <meta name="color-scheme" content="light dark" />
       </head>
-      <body className={`${playfair.className} antialiased`}>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <GalleryProvider>
-            {children}
-            <Footer />
-          </GalleryProvider>
-        </NextIntlClientProvider>
+      <body className={`${playfair.className} antialiased bg-primary text-primary`} suppressHydrationWarning>
+        <ThemeProvider>
+          <NextIntlClientProvider locale={locale} messages={messages}>
+            <GalleryProvider>
+              {children}
+              <Footer />
+            </GalleryProvider>
+          </NextIntlClientProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
