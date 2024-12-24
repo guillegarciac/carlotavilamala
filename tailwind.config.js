@@ -51,6 +51,9 @@ module.exports = {
       borderOpacity: {
         input: 'var(--input-border-opacity)',
       },
+      height: {
+        '36': '9.1rem',
+      },
     },
   },
   plugins: [],
