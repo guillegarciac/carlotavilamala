@@ -7,6 +7,7 @@ import Link from "next/link";
 import LanguageSelector from "./LanguageSelector";
 import { useTranslations, useLocale } from 'next-intl';
 import { useTheme } from '../context/ThemeContext';
+import { useRouter } from 'next/navigation';
 
 export default function MobileMenu({ currentPath }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -14,6 +15,13 @@ export default function MobileMenu({ currentPath }) {
   const locale = useLocale();
   const { isDarkMode, toggleTheme } = useTheme();
   const isHomePage = currentPath === `/${locale}` || currentPath === `/${locale}/`;
+  const router = useRouter();
+
+  const handleNavigation = (e, path) => {
+    e.preventDefault();
+    router.push(path);
+    setIsOpen(false);
+  };
 
   return (
     <div className="md:hidden absolute left-0">
@@ -35,62 +43,69 @@ export default function MobileMenu({ currentPath }) {
       </button>
 
       {/* Mobile Menu Overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 bg-primary z-40">
-          <div className="p-8">
-            <nav className="flex flex-col gap-8 mt-16 text-sm">
-              <Link 
-                href={`/${locale}`}
-                className={isHomePage ? 'text-accent' : 'text-primary'}
-                onClick={() => setIsOpen(false)}
-              >
-                {t('projects')}
-              </Link>
-              <Link 
-                href={`/${locale}/about`}
-                className={currentPath.includes('/about') ? 'text-accent' : 'text-primary'}
-                onClick={() => setIsOpen(false)}
-              >
-                {t('about')}
-              </Link>
-              <Link 
-                href={`/${locale}/contact`}
-                className={currentPath.includes('/contact') ? 'text-accent' : 'text-primary'}
-                onClick={() => setIsOpen(false)}
-              >
-                {t('contact')}
-              </Link>
-              <div className="flex flex-col gap-6">
-                <LanguageSelector />
-                <div className="flex gap-4">
-                  <a 
-                    href="https://instagram.com/bycharlott_" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:text-accent transition-colors"
-                  >
-                    <FaInstagram size={20} />
-                  </a>
-                  <a 
-                    href="https://www.linkedin.com/in/carlota-vilamala-reig/" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="text-primary hover:text-accent transition-colors"
-                  >
-                    <FaLinkedin size={20} />
-                  </a>
-                  <button
-                    onClick={toggleTheme}
-                    className="text-primary hover:text-accent transition-colors"
-                  >
-                    {isDarkMode ? <LuSun size={20} /> : <LuMoon size={20} />}
-                  </button>
-                </div>
+      <div 
+        className={`fixed inset-0 bg-primary z-40 
+          transition-all duration-300 ease-in-out
+          ${isOpen 
+            ? 'opacity-100 translate-x-0' 
+            : 'opacity-0 pointer-events-none -translate-x-full'
+          }`}
+      >
+        <div className={`p-8 transition-transform duration-300 ease-in-out
+          ${isOpen ? 'translate-x-0' : '-translate-x-8'}`}
+        >
+          <nav className="flex flex-col gap-8 mt-16 text-sm">
+            <Link 
+              href={`/${locale}`}
+              className={isHomePage ? 'text-accent' : 'text-primary'}
+              onClick={(e) => handleNavigation(e, `/${locale}`)}
+            >
+              {t('projects')}
+            </Link>
+            <Link 
+              href={`/${locale}/about`}
+              className={currentPath.includes('/about') ? 'text-accent' : 'text-primary'}
+              onClick={(e) => handleNavigation(e, `/${locale}/about`)}
+            >
+              {t('about')}
+            </Link>
+            <Link 
+              href={`/${locale}/contact`}
+              className={currentPath.includes('/contact') ? 'text-accent' : 'text-primary'}
+              onClick={(e) => handleNavigation(e, `/${locale}/contact`)}
+            >
+              {t('contact')}
+            </Link>
+            <div className="flex flex-col gap-6">
+              <LanguageSelector />
+              <div className="flex gap-4">
+                <a 
+                  href="https://instagram.com/bycharlott_" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-accent transition-colors"
+                >
+                  <FaInstagram size={20} />
+                </a>
+                <a 
+                  href="https://www.linkedin.com/in/carlota-vilamala-reig/" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-primary hover:text-accent transition-colors"
+                >
+                  <FaLinkedin size={20} />
+                </a>
+                <button
+                  onClick={toggleTheme}
+                  className="text-primary hover:text-accent transition-colors"
+                >
+                  {isDarkMode ? <LuSun size={20} /> : <LuMoon size={20} />}
+                </button>
               </div>
-            </nav>
-          </div>
+            </div>
+          </nav>
         </div>
-      )}
+      </div>
     </div>
   );
 }
