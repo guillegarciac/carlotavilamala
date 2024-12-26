@@ -16,18 +16,80 @@ import Footer from "./Footer";
 import { useTheme } from '../context/ThemeContext';
 import dynamic from 'next/dynamic';
 
+// Define different layout patterns
+const layoutPatterns = [
+  // Pattern 1: Original
+  {
+    0: { type: 'medium', position: 'left-overlap' },
+    1: { type: 'portrait', position: 'right-overlap' },
+    2: { type: 'full', position: 'center' },
+    3: { type: 'portrait', position: 'left-overlap' },
+    4: { type: 'medium', position: 'right-overlap' },
+    5: { type: 'full', position: 'center' }
+  },
+  // Pattern 2: Alternative
+  {
+    0: { type: 'portrait', position: 'right-overlap' },
+    1: { type: 'medium', position: 'left-overlap' },
+    2: { type: 'portrait', position: 'right-overlap' },
+    3: { type: 'full', position: 'center' },
+    4: { type: 'medium', position: 'left-overlap' },
+    5: { type: 'portrait', position: 'right-overlap' }
+  },
+  // Pattern 3: Another variation
+  {
+    0: { type: 'full', position: 'center' },
+    1: { type: 'medium', position: 'left-overlap' },
+    2: { type: 'portrait', position: 'right-overlap' },
+    3: { type: 'medium', position: 'right-overlap' },
+    4: { type: 'portrait', position: 'left-overlap' },
+    5: { type: 'full', position: 'center' }
+  }
+];
+
+// Function to get a consistent random pattern based on project ID
+const getLayoutPattern = (projectId) => {
+  // Use project ID to get a consistent but random pattern
+  const patternIndex = projectId % layoutPatterns.length;
+  return layoutPatterns[patternIndex];
+};
+
 // Create a separate ProjectItem component to handle individual projects
-const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, focusedImage }) => {
+const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, focusedImage, setFocusedImage }) => {
+  const [isVisible, setIsVisible] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  
+  // Use intersection observer to detect when project is in viewport on mobile
   const [ref, inView] = useInView({
-    threshold: 0,
-    triggerOnce: true
+    threshold: 0.8,
+    triggerOnce: false
   });
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   useEffect(() => {
     if (inView) {
       preloadProjectImages(project);
+      // Only auto-show on mobile
+      if (isClient && window.innerWidth < 768) {
+        setIsVisible(true);
+      }
+    } else {
+      // Hide when out of view
+      setIsVisible(false);
     }
-  }, [inView, project, preloadProjectImages]);
+  }, [inView, project, preloadProjectImages, focusedImage, isClient]);
+
+  // Update isVisible when focusedImage changes
+  useEffect(() => {
+    if (focusedImage === project.id) {
+      setIsVisible(true);
+    } else {
+      setIsVisible(false);
+    }
+  }, [focusedImage, project.id]);
 
   const setRefs = useCallback(
     (element) => {
@@ -40,10 +102,12 @@ const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, 
   return (
     <div
       key={project.id}
-      ref={setRefs}
+      ref={ref}
       data-project-id={project.id}
       className="group cursor-pointer"
       onClick={() => onSelect(project)}
+      onMouseEnter={() => isClient && window.innerWidth >= 768 && setFocusedImage(project.id)}
+      onMouseLeave={() => isClient && window.innerWidth >= 768 && setFocusedImage(null)}
     >
       <div className="relative overflow-hidden aspect-[3/4]">
         <Image
@@ -61,24 +125,47 @@ const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, 
         />
         <div
           className={`absolute inset-0 transition-colors duration-300
-            md:bg-black/0 md:group-hover:bg-black/40
-            ${focusedImage === project.id ? "bg-black/40" : "bg-black/0"}`}
+            bg-black/0
+            ${(focusedImage === project.id || isVisible) ? "bg-black/40" : "bg-black/0"}`}
         >
           <div
             className={`absolute inset-0 flex flex-col items-center justify-center 
               transition-opacity duration-300 text-white text-center p-4
-              md:opacity-0 md:group-hover:opacity-100
-              ${focusedImage === project.id ? "opacity-100" : "opacity-0"}`}
+              opacity-0
+              ${(focusedImage === project.id || isVisible) ? "opacity-100" : "opacity-0"}`}
           >
-            <h3 className="text-lg font-medium tracking-wider mb-2 transform transition-transform duration-300">
-              {t(`${project.id}.title`)}
-            </h3>
-            <p className="text-sm font-light transform transition-transform duration-300">
-              {t(`${project.id}.description`)}
-            </p>
+            <div className="transition-all duration-300">
+              <h3 className="text-xs font-medium tracking-wider mb-1">
+                {t(`${project.id}.title`)}
+              </h3>
+              <p className="text-[11px] font-light">
+                {t(`${project.id}.description`)}
+              </p>
+            </div>
           </div>
         </div>
       </div>
+    </div>
+  );
+};
+
+// Add this new component for desktop navigation with background
+const DesktopNavigation = ({ direction, projectTitle }) => {
+  return (
+    <div 
+      className={`hidden md:flex items-center gap-4 px-6 py-3 bg-white/80 backdrop-blur-sm rounded-full
+        ${direction === 'prev' ? 'hover:translate-x-[-4px]' : 'hover:translate-x-[4px]'}
+        transition-transform duration-200`}
+    >
+      {direction === 'prev' && (
+        <span className="text-lg transform rotate-180">→</span>
+      )}
+      <span className="text-sm tracking-wider text-primary">
+        {projectTitle}
+      </span>
+      {direction === 'next' && (
+        <span className="text-lg">→</span>
+      )}
     </div>
   );
 };
@@ -456,7 +543,7 @@ export default function ImageGallery({ projects }) {
     return (
       <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] h-52 -mt-36 touch-auto">
         {/* Dots and Title in one container */}
-        <div className="flex flex-col h-full pt-2">
+        <div className="flex flex-col h-full pt-6">
           {/* Dots at the top */}
           <div>
             <style>{swiperStyles}</style>
@@ -496,23 +583,13 @@ export default function ImageGallery({ projects }) {
             </Swiper>
           </div>
 
-          {/* Title closer to dots */}
+          {/* Title Section */}
           <div className="mt-1">
             <div className="px-4 text-center">
               <h3 className="text-sm font-medium tracking-wider mb-1">
                 {t(`${selectedImage.id}.title`)}
               </h3>
               <p className="text-xs font-light mb-2">{t(`${selectedImage.id}.description`)}</p>
-              
-              {/* Scroll indicator centered below year */}
-              {showScrollIndicator && selectedImage.detailImages?.length > 0 && (
-                <div className="flex justify-center items-center mt-2">
-                  <IoIosArrowDown 
-                    size={14} 
-                    className={`animate-bounce ${isDarkMode ? 'text-white' : 'text-black'}`}
-                  />
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -540,6 +617,82 @@ export default function ImageGallery({ projects }) {
     }
   }, [selectedImage, t, setGalleryTitle]);
 
+  // Add this near the other scroll indicator effect
+  useEffect(() => {
+    if (selectedImage?.detailImages?.length > 0) {
+      setShowScrollIndicator(true);
+    } else {
+      setShowScrollIndicator(false);
+    }
+  }, [selectedImage]);
+
+  // Add this new component for the Next Project section
+  const renderNextProjectSection = () => {
+    if (!isClient || !isMobileRef.current) return null;
+    
+    return (
+      <div className="fixed bottom-0 left-0 right-0 bg-primary md:hidden z-[500] py-6 px-4 border-t border-primary/10">
+        <button 
+          onClick={navigateToNext}
+          className="w-full text-left group"
+        >
+          <span className="text-[10px] uppercase tracking-wider text-primary/60 block mb-2">
+            {t('next_project')}
+          </span>
+          <div className="flex justify-between items-center">
+            <span className="text-sm tracking-wider">
+              {t(`${getAdjacentProject("next").id}.title`)}
+            </span>
+            <span className="text-lg transform transition-transform group-hover:translate-x-1">
+              →
+            </span>
+          </div>
+        </button>
+      </div>
+    );
+  };
+
+  const getImageLayoutStyle = (index, projectId) => {
+    const layouts = {
+      // Full width horizontal image
+      fullWidth: {
+        container: 'w-[calc(100%-48px)] md:w-[calc(100%-160px)] mx-auto mb-8 md:mb-16 relative clear-both',
+        image: 'w-full h-auto object-contain'
+      },
+      // Portrait image
+      portrait: {
+        container: 'w-[60%] md:w-[55%] mb-8 md:mb-16 relative',
+        image: 'w-full h-auto object-contain'
+      },
+      // Medium image
+      medium: {
+        container: 'w-[40%] md:w-[45%] mb-8 md:mb-16 relative',
+        image: 'w-full h-auto object-contain'
+      }
+    };
+
+    const pattern = getLayoutPattern(projectId);
+    const layout = pattern[index % 6];
+
+    // Mobile layout stays consistent
+    const mobileLayout = `w-[calc(100%-48px)] mx-auto mb-8 relative`;
+
+    // Desktop layout varies based on pattern
+    let desktopLayout = '';
+    if (layout.type === 'full') {
+      desktopLayout = `md:w-[calc(100%-160px)] md:clear-both`;
+    } else if (layout.position === 'left-overlap') {
+      desktopLayout = `md:w-[${layout.type === 'portrait' ? '55%' : '45%'}] md:float-left md:ml-[80px] md:z-10 md:clear-both`;
+    } else if (layout.position === 'right-overlap') {
+      desktopLayout = `md:w-[${layout.type === 'portrait' ? '55%' : '45%'}] md:float-right md:mr-[80px] md:-ml-[10%] md:-mt-[10%] md:z-20`;
+    }
+
+    return {
+      ...layouts[layout.type],
+      container: `${mobileLayout} ${desktopLayout}`
+    };
+  };
+
   return (
     <>
       {/* GALLERY GRID */}
@@ -553,6 +706,7 @@ export default function ImageGallery({ projects }) {
             preloadProjectImages={preloadProjectImages}
             projectRefs={projectRefs}
             focusedImage={focusedImage}
+            setFocusedImage={setFocusedImage}
           />
         ))}
       </div>
@@ -561,9 +715,9 @@ export default function ImageGallery({ projects }) {
       {selectedImage && (
         <>
           {/* Close Button */}
-          <button 
+          <button
             onClick={closeGallery}
-            className={`fixed top-4 right-4 z-50 w-8 h-8 flex items-center justify-center 
+            className={`fixed top-4 right-4 z-[100] w-8 h-8 flex items-center justify-center 
               ${isDarkMode 
                 ? 'bg-black hover:bg-black/80' 
                 : 'bg-white hover:bg-white/80'} 
@@ -576,15 +730,20 @@ export default function ImageGallery({ projects }) {
             />
           </button>
 
-          {/* Modal Content */}
-          <div 
+          {/* Navigation Arrows with Background */}
+          <div className="fixed z-[100] left-6 top-6 hidden md:block">
+            <div className="flex items-center bg-white/80 backdrop-blur-sm rounded-full px-4 py-2">
+              <span className="text-lg transform rotate-180 mr-2">←</span>
+              <span className="text-sm tracking-wider">{t(`${selectedImage.id}.title`)}</span>
+            </div>
+          </div>
+
+          <div
             ref={modalRef}
-            className="fixed inset-0 md:top-[85px] bg-primary md:z-40 overflow-y-auto overscroll-none"
+            className={`fixed inset-0 z-50 bg-primary overflow-y-auto overscroll-none
+              ${isScrolled ? 'md:pt-[105px]' : 'md:pt-6'}
+              transition-all duration-300`}
             onScroll={handleScroll}
-            style={{ 
-              overscrollBehavior: 'none',
-              touchAction: 'pan-y pinch-zoom'
-            }}
           >
             <div className="relative w-full min-h-screen flex flex-col items-center">
               {/* Desktop Info */}
@@ -609,14 +768,17 @@ export default function ImageGallery({ projects }) {
                     >
                       <span className="text-3xl">←</span>
                     </button>
-                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 w-[180px]">
+                    <div className={`opacity-0 group-hover:opacity-100 transition-all duration-300 inline-flex flex-col items-start 
+                      ${isDarkMode ? 'bg-black/40' : 'bg-white/40'} backdrop-blur-sm rounded px-4 py-2 
+                      ${isDarkMode ? 'text-white' : 'text-primary'}`}
+                    >
                       <h3 className="text-xs font-medium tracking-wider mb-1">
                         {t(`${getAdjacentProject("prev").id}.title`)}
                       </h3>
                       <p className="text-[11px] font-light">
                         {t(`${getAdjacentProject("prev").id}.description`)}
                       </p>
-                      <span className="text-lg block mt-2">←</span>
+                      <span className="text-lg mt-1">←</span>
                     </div>
                   </div>
                 </div>
@@ -629,14 +791,17 @@ export default function ImageGallery({ projects }) {
                     >
                       <span className="text-3xl">→</span>
                     </button>
-                    <div className="opacity-0 group-hover:opacity-100 transition-all duration-300 text-right w-[180px]">
+                    <div className={`opacity-0 group-hover:opacity-100 transition-all duration-300 text-right inline-flex flex-col items-end 
+                      ${isDarkMode ? 'bg-black/40' : 'bg-white/40'} backdrop-blur-sm rounded px-4 py-2 
+                      ${isDarkMode ? 'text-white' : 'text-primary'}`}
+                    >
                       <h3 className="text-xs font-medium tracking-wider mb-1">
                         {t(`${getAdjacentProject("next").id}.title`)}
                       </h3>
                       <p className="text-[11px] font-light">
                         {t(`${getAdjacentProject("next").id}.description`)}
                       </p>
-                      <span className="text-lg block mt-2">→</span>
+                      <span className="text-lg mt-1">→</span>
                     </div>
                   </div>
                 </div>
@@ -670,6 +835,7 @@ export default function ImageGallery({ projects }) {
                 </div>
               </div>
 
+              {/* Mobile Controls */}
               {renderMobileControls()}
 
               {/* Next/Prev Images for Swipe Transition */}
@@ -731,25 +897,38 @@ export default function ImageGallery({ projects }) {
               {selectedImage.detailImages && selectedImage.detailImages.length > 0 && (
                 <div 
                   ref={detailImagesRef}
-                  className={`w-full overflow-y-auto mt-0 md:mt-[80px] bg-primary`}
+                  className="w-full overflow-y-auto mt-0 md:mt-[80px] bg-primary pb-24 md:pb-12 px-6 md:px-0"
                 >
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 
-                    w-[80%] md:w-[800px] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px] 
-                    mx-auto px-0 md:px-[120px] lg:px-[160px]
-                    pb-8 md:pb-12"
-                  >
-                    {selectedImage.detailImages.map((imagePath, index) => (
-                      <div key={index} className="relative aspect-[3/4]">
-                        <Image
-                          src={imagePath}
-                          alt={`${t(`${selectedImage.id}.title`)} - Detail ${index + 1}`}
-                          fill
-                          sizes="(max-width: 768px) 80vw, (max-width: 1024px) 50vw, 33vw"
-                          className="object-cover"
-                          quality={75}
-                        />
-                      </div>
-                    ))}
+                  <div className="relative w-full max-w-[2400px] mx-auto">
+                    <div className="relative clearfix flex flex-wrap md:block md:overflow-visible">
+                      {selectedImage.detailImages.map((imagePath, index) => {
+                        const layoutStyles = getImageLayoutStyle(index, selectedImage.id);
+                        return (
+                          <div 
+                            key={index} 
+                            className={`relative ${layoutStyles.container}`}
+                          >
+                            <div className="relative w-full overflow-visible">
+                              <Image
+                                src={imagePath}
+                                alt={`${t(`${selectedImage.id}.title`)} - Detail ${index + 1}`}
+                                width={2000}
+                                height={1500}
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+                                className={`${layoutStyles.image}`}
+                                style={{ 
+                                  width: '100%',
+                                  height: 'auto',
+                                  maxWidth: '100%'
+                                }}
+                                quality={90}
+                                priority={index < 4}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
               )}
@@ -758,6 +937,9 @@ export default function ImageGallery({ projects }) {
               <div className="hidden md:block w-full px-8">
                 <Footer variant="simple" />
               </div>
+
+              {/* Add the Next Project section to the modal content */}
+              {renderNextProjectSection()}
             </div>
           </div>
         </>
