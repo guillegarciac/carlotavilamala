@@ -109,6 +109,9 @@ export default function ImageGallery({ projects }) {
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
 
+  // Add this ref to track scroll state
+  const isScrolledRef = useRef(false);
+
   // Move all window-dependent code into useEffect
   useEffect(() => {
     setIsClient(true);
@@ -137,9 +140,12 @@ export default function ImageGallery({ projects }) {
     
     // Only update title on desktop
     if (window.innerWidth >= 768) {
-      if (scrollTop > 100) {
-        setGalleryTitle(t(`${selectedImage.id}.title`));
-      } else {
+      isScrolledRef.current = scrollTop > 100;
+      if (isScrolledRef.current) {
+        // Only update if the title needs to change
+        const newTitle = t(`${selectedImage.id}.title`);
+        setGalleryTitle(prev => prev !== newTitle ? newTitle : prev);
+      } else if (!isScrolledRef.current && scrollTop <= 100) {
         setGalleryTitle(null);
       }
     }
@@ -306,8 +312,13 @@ export default function ImageGallery({ projects }) {
     if (currentIndex === -1) return;
     const nextIndex = (currentIndex + 1) % projects.length;
     setSelectedImage(projects[nextIndex]);
+    // Check current scroll position directly
+    const isScrolled = modalRef.current?.scrollTop > 100;
+    if (window.innerWidth >= 768 && isScrolled) {
+      setGalleryTitle(t(`${projects[nextIndex].id}.title`));
+    }
     swiperRef.current?.slideToLoop(nextIndex);
-  }, [selectedImage, projects]);
+  }, [selectedImage, projects, t, setGalleryTitle]);
 
   const navigateToPrev = useCallback(() => {
     if (!selectedImage) return;
@@ -315,8 +326,13 @@ export default function ImageGallery({ projects }) {
     if (currentIndex === -1) return;
     const prevIndex = currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
     setSelectedImage(projects[prevIndex]);
+    // Check current scroll position directly
+    const isScrolled = modalRef.current?.scrollTop > 100;
+    if (window.innerWidth >= 768 && isScrolled) {
+      setGalleryTitle(t(`${projects[prevIndex].id}.title`));
+    }
     swiperRef.current?.slideToLoop(prevIndex);
-  }, [selectedImage, projects]);
+  }, [selectedImage, projects, t, setGalleryTitle]);
 
   // HANDLE KEYBOARD EVENTS
   const handleKeyDown = useCallback(
@@ -503,6 +519,26 @@ export default function ImageGallery({ projects }) {
       </div>
     );
   };
+
+  // Add an effect to reset the gallery title when the modal is closed
+  useEffect(() => {
+    if (!selectedImage) {
+      isScrolledRef.current = false;
+      setGalleryTitle(null);
+    }
+  }, [selectedImage, setGalleryTitle]);
+
+  // Add this effect to maintain scroll state and title when image changes
+  useEffect(() => {
+    if (selectedImage && modalRef.current) {
+      const isScrolled = modalRef.current.scrollTop > 100;
+      isScrolledRef.current = isScrolled;
+      
+      if (isScrolled && window.innerWidth >= 768) {
+        setGalleryTitle(t(`${selectedImage.id}.title`));
+      }
+    }
+  }, [selectedImage, t, setGalleryTitle]);
 
   return (
     <>
