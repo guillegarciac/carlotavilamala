@@ -135,10 +135,13 @@ export default function ImageGallery({ projects }) {
   const handleScroll = useCallback((e) => {
     const scrollTop = e.target.scrollTop;
     
-    if (scrollTop > 100) {
-      setGalleryTitle(t(`${selectedImage.id}.title`));
-    } else {
-      setGalleryTitle(null);
+    // Only update title on desktop
+    if (window.innerWidth >= 768) {
+      if (scrollTop > 100) {
+        setGalleryTitle(t(`${selectedImage.id}.title`));
+      } else {
+        setGalleryTitle(null);
+      }
     }
 
     // Reset hasAutoScrolled when user scrolls back to top

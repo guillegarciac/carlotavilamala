@@ -130,7 +130,9 @@ export default function Navigation() {
               ${isLoading ? 'opacity-0' : 'opacity-100'}`}
             onClick={closeGallery}
           >
-            CARLOTA VILAMALA
+            <span className="transition-opacity duration-300">
+              {galleryTitle || 'CARLOTA VILAMALA'}
+            </span>
           </Link>
         </div>
 

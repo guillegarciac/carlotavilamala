@@ -3,12 +3,12 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 
-const GalleryContext = createContext();
+export const GalleryContext = createContext();
 
 export function GalleryProvider({ children }) {
+  const [selectedImage, setSelectedImage] = useState(null);
   const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [galleryTitle, setGalleryTitle] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
   const router = useRouter();
 
   const closeGallery = useCallback(() => {
@@ -37,13 +37,13 @@ export function GalleryProvider({ children }) {
   }, [router]);
 
   return (
-    <GalleryContext.Provider value={{ 
-      isGalleryOpen, 
+    <GalleryContext.Provider value={{
+      selectedImage,
+      setSelectedImage,
+      isGalleryOpen,
       setIsGalleryOpen,
       galleryTitle,
       setGalleryTitle,
-      selectedImage,
-      setSelectedImage,
       closeGallery
     }}>
       {children}
@@ -51,6 +51,4 @@ export function GalleryProvider({ children }) {
   );
 }
 
-export function useGallery() {
-  return useContext(GalleryContext);
-} 
+export const useGallery = () => useContext(GalleryContext); 
