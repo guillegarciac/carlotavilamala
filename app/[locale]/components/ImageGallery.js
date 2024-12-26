@@ -488,10 +488,16 @@ export default function ImageGallery({ projects }) {
 
                 {/* Main Project Image */}
                 <div 
-                  className="h-[calc(100vh-80px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden touch-none md:touch-auto"
+                  className="h-[calc(100vh-80px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden touch-none md:touch-auto relative"
                   onTouchStart={onTouchStart}
                   onTouchMove={onTouchMove}
                   onTouchEnd={onTouchEnd}
+                  style={{ 
+                    width: '100vw',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    padding: '0 24px',
+                  }}
                 >
                   <Image
                     src={selectedImage.imageUrl}
@@ -499,7 +505,10 @@ export default function ImageGallery({ projects }) {
                     fill
                     sizes="(max-width: 768px) 100vw, 80vw"
                     className="object-cover md:object-contain mx-auto pointer-events-none md:pointer-events-auto"
-                    style={{ transform: `translateX(${-swipeProgress}px)` }}
+                    style={{ 
+                      transform: `translateX(${-swipeProgress}px)`,
+                      touchAction: 'none',
+                    }}
                     priority
                     quality={75}
                   />
@@ -507,7 +516,7 @@ export default function ImageGallery({ projects }) {
               </div>
 
               {/* MOBILE CONTROLS + INFO - Single container */}
-              <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] h-36 -mt-36 touch-auto">
+              <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] h-52 -mt-36 touch-auto">
                 {/* Dots and Title in one container */}
                 <div className="flex flex-col h-full pt-2">
                   {/* Dots at the top */}
@@ -628,7 +637,7 @@ export default function ImageGallery({ projects }) {
 
               {/* Detail Images Gallery */}
               {selectedImage.detailImages && selectedImage.detailImages.length > 0 && (
-                <div className="w-full overflow-y-auto mt-0 md:mt-[80px]">
+                <div className={`w-full overflow-y-auto mt-0 md:mt-[80px] bg-primary`}>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 
                     w-[80%] md:w-[800px] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px] 
                     mx-auto px-0 md:px-[120px] lg:px-[160px]
