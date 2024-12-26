@@ -14,6 +14,7 @@ import { IoIosArrowDown } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import Footer from "./Footer";
 import { useTheme } from '../context/ThemeContext';
+import dynamic from 'next/dynamic';
 
 // Create a separate ProjectItem component to handle individual projects
 const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, focusedImage }) => {
@@ -100,24 +101,68 @@ export default function ImageGallery({ projects }) {
   // Add this near other state declarations
   const [isScrolled, setIsScrolled] = useState(false);
 
-  // Simplify the handleScroll function to only handle title change
+  // Add this with other refs
+  const detailImagesRef = useRef(null);
+
+  // Replace the direct state with a ref for initial render
+  const isMobileRef = useRef(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Move all window-dependent code into useEffect
+  useEffect(() => {
+    setIsClient(true);
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768;
+      isMobileRef.current = mobile;
+      setIsMobile(mobile);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Add this state to track if we've already auto-scrolled
+  const [hasAutoScrolled, setHasAutoScrolled] = useState(false);
+
+  // Reset hasAutoScrolled when selected image changes
+  useEffect(() => {
+    setHasAutoScrolled(false);
+  }, [selectedImage]);
+
+  // Modify the handleScroll function
   const handleScroll = useCallback((e) => {
     const scrollTop = e.target.scrollTop;
     
-    // Handle title change
     if (scrollTop > 100) {
       setGalleryTitle(t(`${selectedImage.id}.title`));
     } else {
       setGalleryTitle(null);
     }
 
-    // Hide scroll indicator after user starts scrolling
-    if (scrollTop > 20) {
-      setShowScrollIndicator(false);
-    } else {
+    // Reset hasAutoScrolled when user scrolls back to top
+    if (scrollTop < 20) {
       setShowScrollIndicator(true);
+      setHasAutoScrolled(false);  // Reset when at top
+    } else {
+      setShowScrollIndicator(false);
+      
+      // Only auto-scroll if we haven't done it yet and we're on client-side
+      if (isClient && 
+          isMobileRef.current && 
+          !hasAutoScrolled &&
+          scrollTop > 50 && 
+          selectedImage?.detailImages?.length > 0 && 
+          detailImagesRef.current) {
+        detailImagesRef.current.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+        setHasAutoScrolled(true);
+      }
     }
-  }, [selectedImage, t, setGalleryTitle]);
+  }, [selectedImage, t, setGalleryTitle, hasAutoScrolled, isClient]);
 
   // Instead, just reset the scroll indicator when image changes
   useEffect(() => {
@@ -175,9 +220,9 @@ export default function ImageGallery({ projects }) {
     };
   }, [selectedImage, setIsGalleryOpen, setGalleryTitle]);
 
-  // INTERSECTION OBSERVER (mobile only)
+  // Modify the intersection observer effect
   useEffect(() => {
-    if (window.innerWidth >= 768) return;
+    if (!isClient || !isMobileRef.current) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -198,7 +243,7 @@ export default function ImageGallery({ projects }) {
     });
 
     return () => observer.disconnect();
-  }, []);
+  }, [isClient]);
 
   // Set minimum swipe distance on mount
   useEffect(() => {
@@ -385,6 +430,77 @@ export default function ImageGallery({ projects }) {
 
   const { isDarkMode } = useTheme();
 
+  // Conditionally render mobile-specific elements
+  const renderMobileControls = () => {
+    if (!isClient || !isMobileRef.current) return null;
+    
+    return (
+      <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] h-52 -mt-36 touch-auto">
+        {/* Dots and Title in one container */}
+        <div className="flex flex-col h-full pt-2">
+          {/* Dots at the top */}
+          <div>
+            <style>{swiperStyles}</style>
+            <Swiper
+              modules={[Pagination]}
+              pagination={{
+                clickable: true,
+                type: "bullets",
+                dynamicBullets: true,
+                dynamicMainBullets: 1,
+              }}
+              preventClicksPropagation={true}
+              preventClicks={true}
+              allowTouchMove={false}
+              onSwiper={(swiper) => {
+                swiperRef.current = swiper;
+                setTimeout(() => {
+                  const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
+                  swiper.slideTo(currentIndex, 0);
+                }, 0);
+              }}
+              onSlideChange={(swiper) => {
+                const newIndex = swiper.activeIndex;
+                setSelectedImage(projects[newIndex]);
+              }}
+              spaceBetween={50}
+              slidesPerView={1}
+              loop={false}
+              initialSlide={projects.findIndex((p) => p.id === selectedImage.id)}
+              className="h-6 w-full"
+            >
+              {projects.map((project, index) => (
+                <SwiperSlide key={project.id}>
+                  <div className="text-center opacity-0 h-full">{index + 1}</div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          </div>
+
+          {/* Title closer to dots */}
+          <div className="mt-1">
+            <div className="px-4 text-center">
+              <h3 className="text-sm font-medium tracking-wider mb-1">
+                {t(`${selectedImage.id}.title`)}
+              </h3>
+              <p className="text-xs font-light mb-2">{t(`${selectedImage.id}.description`)}</p>
+              
+              {/* Scroll indicator centered below year */}
+              {showScrollIndicator && selectedImage.detailImages?.length > 0 && (
+                <div className="flex justify-center items-center mt-2">
+                  <IoIosArrowDown 
+                    size={14} 
+                    className={`animate-bounce ${isDarkMode ? 'text-white' : 'text-black'}`}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <>
       {/* GALLERY GRID */}
@@ -493,9 +609,9 @@ export default function ImageGallery({ projects }) {
                   onTouchMove={onTouchMove}
                   onTouchEnd={onTouchEnd}
                   style={{ 
-                    width: '100vw',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
+                    width: isMobileRef.current ? '100vw' : '100%',
+                    left: isMobileRef.current ? '50%' : '0',
+                    transform: isMobileRef.current ? 'translateX(-50%)' : 'none',
                     padding: '0 24px',
                   }}
                 >
@@ -515,70 +631,7 @@ export default function ImageGallery({ projects }) {
                 </div>
               </div>
 
-              {/* MOBILE CONTROLS + INFO - Single container */}
-              <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] h-52 -mt-36 touch-auto">
-                {/* Dots and Title in one container */}
-                <div className="flex flex-col h-full pt-2">
-                  {/* Dots at the top */}
-                  <div>
-                    <style>{swiperStyles}</style>
-                    <Swiper
-                      modules={[Pagination]}
-                      pagination={{
-                        clickable: true,
-                        type: "bullets",
-                        dynamicBullets: true,
-                        dynamicMainBullets: 1,
-                      }}
-                      preventClicksPropagation={true}
-                      preventClicks={true}
-                      allowTouchMove={false}
-                      onSwiper={(swiper) => {
-                        swiperRef.current = swiper;
-                        setTimeout(() => {
-                          const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
-                          swiper.slideTo(currentIndex, 0);
-                        }, 0);
-                      }}
-                      onSlideChange={(swiper) => {
-                        const newIndex = swiper.activeIndex;
-                        setSelectedImage(projects[newIndex]);
-                      }}
-                      spaceBetween={50}
-                      slidesPerView={1}
-                      loop={false}
-                      initialSlide={projects.findIndex((p) => p.id === selectedImage.id)}
-                      className="h-6 w-full"
-                    >
-                      {projects.map((project, index) => (
-                        <SwiperSlide key={project.id}>
-                          <div className="text-center opacity-0 h-full">{index + 1}</div>
-                        </SwiperSlide>
-                      ))}
-                    </Swiper>
-                  </div>
-
-                  {/* Title closer to dots */}
-                  <div className="mt-1">
-                    <div className="px-4 text-center">
-                      <h3 className="text-sm font-medium tracking-wider mb-1">
-                        {t(`${selectedImage.id}.title`)}
-                      </h3>
-                      <p className="text-xs font-light mb-2">{t(`${selectedImage.id}.description`)}</p>
-                      
-                      {/* Scroll indicator centered below year */}
-                      {showScrollIndicator && selectedImage.detailImages?.length > 0 && (
-                        <div className="flex justify-center items-center mt-2">
-                          <IoIosArrowDown 
-                            size={14} 
-                            className={`animate-bounce ${isDarkMode ? 'text-white' : 'text-black'}`}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
+              {renderMobileControls()}
 
               {/* Next/Prev Images for Swipe Transition */}
               {Math.abs(swipeProgress) > 0 && (
@@ -637,7 +690,10 @@ export default function ImageGallery({ projects }) {
 
               {/* Detail Images Gallery */}
               {selectedImage.detailImages && selectedImage.detailImages.length > 0 && (
-                <div className={`w-full overflow-y-auto mt-0 md:mt-[80px] bg-primary`}>
+                <div 
+                  ref={detailImagesRef}
+                  className={`w-full overflow-y-auto mt-0 md:mt-[80px] bg-primary`}
+                >
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 
                     w-[80%] md:w-[800px] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px] 
                     mx-auto px-0 md:px-[120px] lg:px-[160px]
