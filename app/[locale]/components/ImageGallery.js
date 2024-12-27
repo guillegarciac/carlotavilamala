@@ -18,32 +18,14 @@ import dynamic from 'next/dynamic';
 
 // Define different layout patterns
 const layoutPatterns = [
-  // Pattern 1: Original
+  // Single pattern for consistent grid layout
   {
-    0: { type: 'medium', position: 'left-overlap' },
-    1: { type: 'portrait', position: 'right-overlap' },
-    2: { type: 'full', position: 'center' },
-    3: { type: 'portrait', position: 'left-overlap' },
-    4: { type: 'medium', position: 'right-overlap' },
-    5: { type: 'full', position: 'center' }
-  },
-  // Pattern 2: Alternative
-  {
-    0: { type: 'portrait', position: 'right-overlap' },
-    1: { type: 'medium', position: 'left-overlap' },
-    2: { type: 'portrait', position: 'right-overlap' },
-    3: { type: 'full', position: 'center' },
-    4: { type: 'medium', position: 'left-overlap' },
-    5: { type: 'portrait', position: 'right-overlap' }
-  },
-  // Pattern 3: Another variation
-  {
-    0: { type: 'full', position: 'center' },
-    1: { type: 'medium', position: 'left-overlap' },
-    2: { type: 'portrait', position: 'right-overlap' },
-    3: { type: 'medium', position: 'right-overlap' },
-    4: { type: 'portrait', position: 'left-overlap' },
-    5: { type: 'full', position: 'center' }
+    0: { type: 'standard', position: 'left' },
+    1: { type: 'standard', position: 'center' },
+    2: { type: 'standard', position: 'right' },
+    3: { type: 'standard', position: 'left' },
+    4: { type: 'standard', position: 'center' },
+    5: { type: 'standard', position: 'right' }
   }
 ];
 
@@ -77,23 +59,18 @@ const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, 
     
     if (inView) {
       preloadProjectImages(project);
-      // Only auto-show on mobile
-      if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        setIsVisible(true);
-      }
-    } else {
-      setIsVisible(false);
     }
   }, [inView, project, preloadProjectImages, focusedImage]);
 
   // Update isVisible when focusedImage changes
   useEffect(() => {
-    if (focusedImage === project.id) {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
+    if (focusedImage === project.id || (isMobile && inView)) {
       setIsVisible(true);
     } else {
       setIsVisible(false);
     }
-  }, [focusedImage, project.id]);
+  }, [focusedImage, project.id, inView]);
 
   const setRefs = useCallback(
     (element) => {
@@ -110,8 +87,8 @@ const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, 
       data-project-id={project.id}
       className="group cursor-pointer"
       onClick={() => onSelect(project)}
-      onMouseEnter={() => hasMounted.current && setFocusedImage(project.id)}
-      onMouseLeave={() => hasMounted.current && setFocusedImage(null)}
+      onMouseEnter={() => setFocusedImage(project.id)}
+      onMouseLeave={() => setFocusedImage(null)}
     >
       <div className="relative overflow-hidden aspect-[3/4]">
         <Image
@@ -403,6 +380,15 @@ export default function ImageGallery({ projects }) {
     if (currentIndex === -1) return;
     const nextIndex = (currentIndex + 1) % projects.length;
     setSelectedImage(projects[nextIndex]);
+    
+    // Scroll to top smoothly
+    if (modalRef.current) {
+      modalRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+    
     // Check current scroll position directly
     const isScrolled = modalRef.current?.scrollTop > 100;
     if (window.innerWidth >= 768 && isScrolled) {
@@ -417,6 +403,15 @@ export default function ImageGallery({ projects }) {
     if (currentIndex === -1) return;
     const prevIndex = currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
     setSelectedImage(projects[prevIndex]);
+    
+    // Scroll to top smoothly
+    if (modalRef.current) {
+      modalRef.current.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
+    
     // Check current scroll position directly
     const isScrolled = modalRef.current?.scrollTop > 100;
     if (window.innerWidth >= 768 && isScrolled) {
@@ -484,39 +479,54 @@ export default function ImageGallery({ projects }) {
     return Math.min(Math.abs(progress) / maxProgress, 1);
   }, []);
 
-  // Add this function inside ImageGallery component
-  const preloadImage = (src) => {
+  // PRELOAD IMAGES
+  const preloadImage = useCallback((src) => {
     return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.src = src;
-      img.onload = resolve;
-      img.onerror = reject;
+      if (typeof window === 'undefined') {
+        resolve();
+        return;
+      }
+
+      // Use link preload instead of Image constructor
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'image';
+      link.href = src;
+      link.onload = resolve;
+      link.onerror = () => {
+        // Silently resolve on error to prevent console warnings
+        resolve();
+      };
+      document.head.appendChild(link);
     });
-  };
+  }, []);
 
   // Add this near other state declarations
   const [loadedProjects, setLoadedProjects] = useState(new Set());
 
   // Add this function to handle preloading of detail images
-  const preloadProjectImages = useCallback(async (project) => {
+  const preloadProjectImages = useCallback((project) => {
     if (!project || loadedProjects.has(project.id)) return;
 
-    try {
-      // Check if project has detail images
-      if (project.detailImages && project.detailImages.length > 0) {
-        await Promise.all(
-          project.detailImages.map(imagePath => 
-            preloadImage(imagePath).catch(err => 
-              console.warn(`Failed to preload image ${imagePath}:`, err)
-            )
-          )
-        );
-        setLoadedProjects(prev => new Set([...prev, project.id]));
-      }
-    } catch (error) {
-      console.error(`Error preloading images for project ${project.id}:`, error);
-    }
-  }, [loadedProjects]);
+    // Add to loaded projects set
+    setLoadedProjects(prev => new Set([...prev, project.id]));
+
+    // Create an array of all images to preload
+    const imagesToPreload = [
+      project.imageUrl,
+      ...(project.detailImages || [])
+    ];
+
+    // Preload images in sequence
+    // Use Promise.all but ignore errors
+    Promise.all(
+      imagesToPreload.map(src => 
+        preloadImage(src).catch(() => {
+          // Silently ignore preload failures
+        })
+      )
+    );
+  }, [preloadImage, loadedProjects]);
 
   // Add this effect near other useEffects
   useEffect(() => {
@@ -547,7 +557,7 @@ export default function ImageGallery({ projects }) {
     return (
       <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] h-52 -mt-36 touch-auto">
         {/* Dots and Title in one container */}
-        <div className="flex flex-col h-full pt-6">
+        <div className="flex flex-col h-full pt-4">
           {/* Dots at the top */}
           <div>
             <style>{swiperStyles}</style>
@@ -594,6 +604,15 @@ export default function ImageGallery({ projects }) {
                 {t(`${selectedImage.id}.title`)}
               </h3>
               <p className="text-xs font-light mb-2">{t(`${selectedImage.id}.description`)}</p>
+              {/* Scroll Indicator Arrow */}
+              {selectedImage.detailImages?.length > 0 && showScrollIndicator && (
+                <div className="mt-2">
+                  <IoIosArrowDown 
+                    size={16} 
+                    className="text-primary animate-bounce mx-auto" 
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -658,19 +677,9 @@ export default function ImageGallery({ projects }) {
 
   const getImageLayoutStyle = (index, projectId) => {
     const layouts = {
-      // Full width horizontal image
-      fullWidth: {
-        container: 'w-[calc(100%-48px)] md:w-[calc(100%-160px)] mx-auto mb-8 md:mb-16 relative clear-both',
-        image: 'w-full h-auto object-contain'
-      },
-      // Portrait image
-      portrait: {
-        container: 'w-[60%] md:w-[55%] mb-8 md:mb-16 relative',
-        image: 'w-full h-auto object-contain'
-      },
-      // Medium image
-      medium: {
-        container: 'w-[40%] md:w-[45%] mb-8 md:mb-16 relative',
+      // Standard size for all images
+      standard: {
+        container: 'w-[calc(100%-48px)] md:w-[30%] mb-8 md:mb-16 relative',
         image: 'w-full h-auto object-contain'
       }
     };
@@ -681,19 +690,19 @@ export default function ImageGallery({ projects }) {
     // Mobile layout stays consistent
     const mobileLayout = `w-[calc(100%-48px)] mx-auto mb-8 relative`;
 
-    // Desktop layout varies based on pattern
+    // Desktop layout with consistent spacing
     let desktopLayout = '';
-    if (layout.type === 'full') {
-      desktopLayout = `md:w-[calc(100%-160px)] md:clear-both`;
-    } else if (layout.position === 'left-overlap') {
-      desktopLayout = `md:w-[${layout.type === 'portrait' ? '55%' : '45%'}] md:float-left md:ml-[80px] md:z-10 md:clear-both`;
-    } else if (layout.position === 'right-overlap') {
-      desktopLayout = `md:w-[${layout.type === 'portrait' ? '55%' : '45%'}] md:float-right md:mr-[80px] md:-ml-[10%] md:-mt-[10%] md:z-20`;
+    if (layout.position === 'left') {
+      desktopLayout = `md:w-[30%] md:ml-[3%]`;
+    } else if (layout.position === 'right') {
+      desktopLayout = `md:w-[30%] md:mr-[3%]`;
+    } else {
+      desktopLayout = `md:w-[30%] md:mx-auto`;
     }
 
     return {
       ...layouts[layout.type],
-      container: `${mobileLayout} ${desktopLayout}`
+      container: `${mobileLayout} ${desktopLayout} inline-block`
     };
   };
 
@@ -904,29 +913,27 @@ export default function ImageGallery({ projects }) {
                   className="w-full overflow-y-auto mt-0 md:mt-[80px] bg-primary pb-24 md:pb-12 px-6 md:px-0"
                 >
                   <div className="relative w-full max-w-[2400px] mx-auto">
-                    <div className="relative clearfix flex flex-wrap md:block md:overflow-visible">
+                    <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
                       {selectedImage.detailImages.map((imagePath, index) => {
                         const layoutStyles = getImageLayoutStyle(index, selectedImage.id);
                         return (
                           <div 
                             key={index} 
-                            className={`relative ${layoutStyles.container}`}
+                            className="relative w-full aspect-[3/4]"
                           >
-                            <div className="relative w-full overflow-visible">
+                            <div className="relative w-full h-full overflow-hidden">
                               <Image
                                 src={imagePath}
                                 alt={`${t(`${selectedImage.id}.title`)} - Detail ${index + 1}`}
-                                width={2000}
-                                height={1500}
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
-                                className={`${layoutStyles.image}`}
-                                style={{ 
-                                  width: '100%',
-                                  height: 'auto',
-                                  maxWidth: '100%'
+                                width={2400}
+                                height={1800}
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw"
+                                className="w-full h-full object-cover"
+                                style={{
+                                  objectPosition: 'center center'
                                 }}
-                                quality={90}
                                 priority={index < 4}
+                                quality={95}
                               />
                             </div>
                           </div>

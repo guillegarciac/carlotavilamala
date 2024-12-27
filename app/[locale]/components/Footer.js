@@ -24,7 +24,7 @@ export default function Footer({ variant = 'default', className = '' }) {
   }
 
   return (
-    <footer className={`py-8 mb-4 bg-primary mt-auto text-primary transition-colors duration-300 ${className}`}>
+    <footer className={`py-8 bg-primary mt-auto text-primary transition-colors ${className}`}>
       <div className="text-[12px] relative">
         <div className="flex flex-col md:flex-row md:justify-between gap-2 md:gap-0">
           <div className="text-center md:text-left md:absolute md:left-8">
