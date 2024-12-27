@@ -57,7 +57,7 @@ const getLayoutPattern = (projectId) => {
 // Create a separate ProjectItem component to handle individual projects
 const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, focusedImage, setFocusedImage }) => {
   const [isVisible, setIsVisible] = useState(false);
-  const [isClient, setIsClient] = useState(false);
+  const hasMounted = useRef(false);
   
   // Use intersection observer to detect when project is in viewport on mobile
   const [ref, inView] = useInView({
@@ -66,21 +66,25 @@ const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, 
   });
 
   useEffect(() => {
-    setIsClient(true);
+    hasMounted.current = true;
+    return () => {
+      hasMounted.current = false;
+    };
   }, []);
 
   useEffect(() => {
+    if (!hasMounted.current) return;
+    
     if (inView) {
       preloadProjectImages(project);
       // Only auto-show on mobile
-      if (isClient && window.innerWidth < 768) {
+      if (typeof window !== 'undefined' && window.innerWidth < 768) {
         setIsVisible(true);
       }
     } else {
-      // Hide when out of view
       setIsVisible(false);
     }
-  }, [inView, project, preloadProjectImages, focusedImage, isClient]);
+  }, [inView, project, preloadProjectImages, focusedImage]);
 
   // Update isVisible when focusedImage changes
   useEffect(() => {
@@ -106,8 +110,8 @@ const ProjectItem = ({ project, onSelect, t, preloadProjectImages, projectRefs, 
       data-project-id={project.id}
       className="group cursor-pointer"
       onClick={() => onSelect(project)}
-      onMouseEnter={() => isClient && window.innerWidth >= 768 && setFocusedImage(project.id)}
-      onMouseLeave={() => isClient && window.innerWidth >= 768 && setFocusedImage(null)}
+      onMouseEnter={() => hasMounted.current && setFocusedImage(project.id)}
+      onMouseLeave={() => hasMounted.current && setFocusedImage(null)}
     >
       <div className="relative overflow-hidden aspect-[3/4]">
         <Image

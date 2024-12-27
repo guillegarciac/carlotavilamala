@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaInstagram, FaLinkedin } from "react-icons/fa";
 import { LuSun, LuMoon } from "react-icons/lu";
 import Link from "next/link";
@@ -11,17 +11,25 @@ import { useRouter } from 'next/navigation';
 
 export default function MobileMenu({ currentPath }) {
   const [isOpen, setIsOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const t = useTranslations('navigation');
   const locale = useLocale();
   const { isDarkMode, toggleTheme } = useTheme();
   const isHomePage = currentPath === `/${locale}` || currentPath === `/${locale}/`;
   const router = useRouter();
 
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   const handleNavigation = (e, path) => {
     e.preventDefault();
     router.push(path);
     setIsOpen(false);
   };
+
+  const bgColor = isDarkMode ? 'bg-white' : 'bg-black';
+  const textColor = isDarkMode ? 'text-black' : 'text-white';
 
   return (
     <div className="md:hidden absolute left-0">
@@ -32,11 +40,11 @@ export default function MobileMenu({ currentPath }) {
       >
         <div className="w-8 h-5 flex flex-col justify-center relative">
           <span className={`w-full h-[1px] absolute transition-all duration-300 -translate-y-1
-            ${isDarkMode ? 'bg-white' : 'bg-black'}`}
+            ${bgColor}`}
             style={{ transform: isOpen ? 'rotate(45deg) translate(0)' : '' }}
           />
           <span className={`w-full h-[1px] absolute transition-all duration-300 translate-y-1
-            ${isDarkMode ? 'bg-white' : 'bg-black'}`}
+            ${bgColor}`}
             style={{ transform: isOpen ? 'rotate(-45deg) translate(0)' : '' }}
           />
         </div>
@@ -99,7 +107,7 @@ export default function MobileMenu({ currentPath }) {
                   onClick={toggleTheme}
                   className="text-primary hover:text-accent transition-colors"
                 >
-                  {isDarkMode ? <LuSun size={20} /> : <LuMoon size={20} />}
+                  {mounted && (isDarkMode ? <LuSun size={20} /> : <LuMoon size={20} />)}
                 </button>
               </div>
             </div>

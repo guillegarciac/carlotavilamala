@@ -29,6 +29,7 @@ export default function Navigation() {
   const router = useRouter();
   const { isDarkMode, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
 
   // Show animation on page refresh but not on navigation or language change
   useEffect(() => {
@@ -91,6 +92,11 @@ export default function Navigation() {
     router.push(pathname.replace(`/${locale}`, `/${newLocale}`));
   };
 
+  // Handle mounting state
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <>
       {/* Loading Overlay with Centered Title */}
@@ -118,7 +124,7 @@ export default function Navigation() {
         py-4 md:py-6 pt-8 md:pt-4`}>
         {/* Mobile Menu */}
         <div className="md:hidden absolute left-0">
-          <MobileMenu currentPath={pathname} />
+          {mounted && <MobileMenu currentPath={pathname} />}
         </div>
 
         {/* Logo/Project Title Container */}
@@ -184,10 +190,9 @@ export default function Navigation() {
           </div>
           <button
             onClick={toggleTheme}
-            className="hover:opacity-50 transition-opacity ml-4"
-            aria-label={isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="text-primary hover:text-accent transition-colors"
           >
-            {isDarkMode ? <LuSun size={20} /> : <LuMoon size={20} />}
+            {mounted && (isDarkMode ? <LuSun size={20} /> : <LuMoon size={20} />)}
           </button>
         </div>
       </nav>
