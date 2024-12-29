@@ -34,6 +34,125 @@
         "styling": "Fashion Styling",
         "storytelling": "Visual Storytelling"
       }
+    },
+    "experience": {
+      "title": "EXPERIENCE",
+      "timeline": [
+        {
+          "company": "Massimo Dutti",
+          "role": "Visual Merchandiser",
+          "period": "May 2024 - Present",
+          "location": "Barcelona, Spain",
+          "current": true,
+          "duration": "8 mos"
+        },
+        {
+          "role": "Fashion Stylist",
+          "type": "Self-employed",
+          "location": "Barcelona, Spain",
+          "period": "Jun 2021 - May 2024",
+          "duration": "3 yrs 9 mos",
+          "nestedItems": [
+            {
+              "company": "Tous",
+              "role": "E-commerce Stylist",
+              "location": "Barcelona, Spain",
+              "description": [
+                "Creation of looks for e-commerce photos",
+                "Product management with the sales department",
+                "Documenting results for styling/studio seeking new sale opportunities",
+                "Search for new online/offline proposals and trends",
+                "Advice on model acting",
+                "Communication between Product, Creative, VMs, Retouch and Online to ensure best practice"
+              ]
+            },
+            {
+              "company": "Multiple Editorials, Fashion Films and Campaigns",
+              "role": "Freelance Stylist Assistant",
+              "description": "Editorials, fashion films and campaigns"
+            }
+          ]
+        },
+        
+        {
+          "company": "3Chic Showroom",
+          "role": "Showroom Assistant",
+          "type": "Full-time",
+          "period": "Jan 2021 - May 2021",
+          "location": "Barcelona, Spain",
+          "duration": "5 mos",
+          "description": [
+            "Management of stylist shopping, shipping, and returns",
+            "Clipping: searching, tracking, and compiling brand publications",
+            "Management of collaborations with influencers/celebrities",
+            "Writing content for social media and press releases",
+            "Assisting stylists in searching for garments based on the moodboard"
+          ],
+          "skills": ["Fashion styling", "Communication skills", "Customer service", "Fashion trends awareness", "Computer skills"]
+        },
+        {
+          "company": "Lia Swimwear",
+          "role": "Marketing and communication",
+          "period": "May 2019 - Dec 2019",
+          "duration": "8 mos",
+          "location": "Barcelona, Spain"
+        },
+        {
+          "company": "Cristina Tamborero",
+          "role": "Marketing and communication of fashion luxury",
+          "type": "Part-time",
+          "period": "Jan 2019 - May 2019",
+          "duration": "5 mos",
+          "location": "Barcelona, Spain"
+        },
+        {
+          "company": "Brandy Melville",
+          "role": "Visual Merchandiser",
+          "period": "Nov 2015 - Dec 2018",
+          "type": "Full-time",
+          "duration": "3 yr 2 mos",
+          "nestedItems": [
+            {
+              "company": "Brandy Melville",
+              "role": "Visual Merchandiser",
+              "period": "May 2017 - Dec 2018",
+              "location": "London, UK",
+              "duration": "1 yr 8 mos",
+              "description": [
+                "Maximize customer interest and sales levels by displaying products appropriately",
+                "Key holder",
+                "Produce layout plans for stores and maintain store shelves and inventory",
+                "Analyzing every aspect of bestsellers (for example, the bestselling price points, colours or styles) and ensuring that they reach their full potential",
+                "Supervise and implement the visual of all Brandy Melville London stores",
+                "Assembling and dismantling decoration in windows"
+              ],
+              "skills": ["Product display", "Problem-solving", "Trend Awareness", "Creativity", "VM", "Organization", "Product Knowledge"]
+            },
+            {
+              "company": "Brandy Melville",
+              "role": "Visual Merchandiser",
+              "period": "Feb 2016 - May 2017",
+              "location": "Barcelona, Spain",
+              "duration": "1 yr 4 mos",
+              "description": [
+                "Maximize customer interest and sales levels by displaying products appropriately",
+                "Key holder",
+                "Produce layout plans for stores and maintain store shelves and inventory",
+                "Analyzing every aspect of bestsellers (for example, the bestselling price points, colours or styles) and ensuring that they reach their full potential"
+              ],
+              "skills": ["Product display", "Problem-solving", "Trend Awareness", "Creativity", "VM", "Organization", "Product Knowledge"]
+            },
+            {
+              "company": "Brandy Melville",
+              "role": "Sales assistant",
+              "period": "Nov 2015 - Feb 2016",
+              "duration": "4 mos",
+              "location": "Barcelona, Spain",
+              "skills": ["Product knowledge", "Customer service", "Communication"]
+            }
+          ]
+        }
+      ]
     }
   },
   "contact": {

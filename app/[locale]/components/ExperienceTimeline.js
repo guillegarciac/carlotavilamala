@@ -1,0 +1,90 @@
+"use client";
+
+import { useTranslations } from 'next-intl';
+import { motion } from 'framer-motion';
+
+export default function ExperienceTimeline() {
+  const t = useTranslations('about.experience');
+
+  const fadeInUp = {
+    initial: { opacity: 0, y: 20 },
+    animate: { opacity: 1, y: 0 },
+    transition: { duration: 0.5 }
+  };
+
+  const renderTimelineItem = (item, isNested = false) => (
+    <div className={`${isNested ? 'ml-4' : ''}`}>
+      {/* Role & Period */}
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-2">
+        <div>
+          <div className="text-sm font-normal">
+            {item.role}
+            {item.current && (
+              <span className="text-[#FF4444] text-sm ml-2">· Current</span>
+            )}
+          </div>
+          <div className="text-sm text-black/60 leading-none mt-0.5">
+            {item.company ? (
+              <>
+                {item.company}
+                {item.location && <span> - {item.location}</span>}
+              </>
+            ) : (
+              item.location
+            )}
+          </div>
+        </div>
+        <div className="text-sm text-black/60 sm:text-right">
+          <div>{item.period}</div>
+          {item.duration && (
+            <div className="hidden sm:block text-xs leading-none sm:mt-0.5">
+              {item.duration}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderNestedItems = (items) => (
+    <div className="mt-2 space-y-2">
+      {items.map((item, index) => (
+        <div key={index}>
+          {renderTimelineItem(item, true)}
+          {item.nestedItems && renderNestedItems(item.nestedItems)}
+        </div>
+      ))}
+    </div>
+  );
+
+  return (
+    <div className="relative">
+      <div className="space-y-4">
+        {t.raw('timeline').map((experience, index, array) => (
+          <motion.div
+            key={`${experience.company || experience.role}-${index}`}
+            className="relative pl-8"
+            {...fadeInUp}
+            transition={{ delay: index * 0.1 }}
+          >
+            {/* Timeline line */}
+            {index < array.length - 1 && (
+              <div className="absolute left-[2.5px] top-[10px] w-[1px] h-[calc(100%_+_4px)] bg-black" />
+            )}
+
+            {/* Timeline dot */}
+            <div className="absolute left-0 top-2 z-10">
+              <div className="w-[6px] h-[6px] rounded-full bg-black" />
+            </div>
+
+            {/* Content */}
+            <div>
+              {renderTimelineItem(experience)}
+              {experience.nestedItems && renderNestedItems(experience.nestedItems)}
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </div>
+  );
+} 

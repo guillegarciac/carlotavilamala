@@ -34,6 +34,48 @@
         "styling": "Estilisme",
         "storytelling": "Narrativa Visual"
       }
+    },
+    "experience": {
+      "title": "EXPERIÈNCIA",
+      "timeline": [
+        {
+          "company": "Massimo Dutti",
+          "role": "Visual Merchandiser",
+          "period": "Maig 2024 - Present",
+          "location": "Barcelona, Catalunya",
+          "current": true
+        },
+        {
+          "company": "Autònoma",
+          "role": "Estilista de Moda",
+          "period": "Juny 2021 - Maig 2024",
+          "location": "Barcelona, Catalunya"
+        },
+        {
+          "company": "Schön Magazine",
+          "role": "Estilista de Moda",
+          "period": "Set 2020 - Juny 2021",
+          "location": "Barcelona, Catalunya"
+        },
+        {
+          "company": "3Chic Showroom",
+          "role": "Assistent de Showroom",
+          "period": "Gener 2021 - Maig 2021",
+          "location": "Barcelona, Catalunya"
+        },
+        {
+          "company": "Lia Swimwear",
+          "role": "Màrqueting i Comunicació",
+          "period": "Maig 2019 - Des 2019",
+          "location": "Barcelona, Catalunya"
+        },
+        {
+          "company": "Brandy Melville",
+          "role": "Visual Merchandiser",
+          "period": "Maig 2017 - Des 2018",
+          "location": "Londres, Regne Unit"
+        }
+      ]
     }
   },
   "contact": {
