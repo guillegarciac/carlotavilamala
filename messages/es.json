@@ -9,8 +9,8 @@
   },
   "about": {
     "title": "BIO",
-    "bio": "Me gusta la moda, es parte de mi vida. La moda es diseño pero la moda también es comunicación. Debe llegar a todos los públicos, por lo que necesitas entenderla y saber explicarla. Por eso he estudiado gestión de eventos de moda, protocolo, relaciones institucionales, comunicación y marketing.",
-    "bio2": "Estilista es mi próximo objetivo. He trabajado en Londres y Barcelona, dos ciudades que me han inspirado porque la moda está en todas partes. Me gusta crear historias alrededor de la moda, como hacen las grandes marcas creando un storytelling que saben transmitir en sus shows. Por ahora los admiro, mi sueño es llegar a hacerlo yo misma algún día.",
+    "bio": "Amo la moda, es parte de mi vida. La moda es diseño pero la moda también es comunicación. Debe llegar a todos los públicos, por lo que necesitas entenderla y saber explicarla. Por eso he estudiado gestión de eventos de moda, protocolo, relaciones institucionales, comunicación y marketing.",
+    "bio2": "Estilista es mi próximo objetivo. He trabajado en Londres y Barcelona, dos ciudades que me han inspirado porque la moda está en todas partes. Me gusta crear historias alrededor de la moda, como hacen las grandes marcas creando storytelling que saben transmitir en sus shows. Por ahora los admiro, mi sueño es llegar a hacerlo yo misma algún día.",
     "clients": {
       "title": "CLIENTES",
       "list": {
@@ -25,13 +25,13 @@
       }
     },
     "expertise": {
-      "title": "EXPERIENCIA",
+      "title": "ESPECIALIZACIÓN",
       "list": {
         "events": "Gestión de Eventos de Moda",
         "protocol": "Protocolo y Relaciones Institucionales",
         "communication": "Comunicación de Moda",
         "marketing": "Estrategia de Marketing",
-        "styling": "Estilismo",
+        "styling": "Estilismo de Moda",
         "storytelling": "Narrativa Visual"
       }
     },
@@ -41,51 +41,124 @@
         {
           "company": "Massimo Dutti",
           "role": "Visual Merchandiser",
-          "period": "Mayo 2024 - Presente",
+          "period": "May 2024 - Presente",
           "location": "Barcelona, España",
-          "current": true
+          "current": true,
+          "duration": "8 meses"
         },
         {
-          "company": "Autónoma",
           "role": "Estilista de Moda",
-          "period": "Junio 2021 - Mayo 2024",
-          "location": "Barcelona, España"
-        },
-        {
-          "company": "Schön Magazine",
-          "role": "Estilista de Moda",
-          "period": "Sept 2020 - Junio 2021",
-          "location": "Barcelona, España"
+          "type": "Autónoma",
+          "location": "Barcelona, España",
+          "period": "Jun 2021 - May 2024",
+          "duration": "3 años 9 meses",
+          "nestedItems": [
+            {
+              "company": "Tous",
+              "role": "Estilista E-commerce",
+              "location": "Barcelona, España",
+              "description": [
+                "Creación de looks para fotos de e-commerce",
+                "Gestión de producto con el departamento de ventas",
+                "Documentación de resultados para estilismo/estudio buscando nuevas oportunidades de venta",
+                "Búsqueda de nuevas propuestas y tendencias online/offline",
+                "Asesoramiento en actuación de modelos",
+                "Comunicación entre Producto, Creativo, VMs, Retoque y Online para asegurar las mejores prácticas"
+              ]
+            },
+            {
+              "company": "Múltiples Editoriales, Fashion Films y Campañas",
+              "role": "Asistente de Estilismo Freelance",
+              "description": "Editoriales, fashion films y campañas"
+            }
+          ]
         },
         {
           "company": "3Chic Showroom",
           "role": "Asistente de Showroom",
-          "period": "Enero 2021 - Mayo 2021",
-          "location": "Barcelona, España"
+          "period": "Ene 2021 - May 2021",
+          "location": "Barcelona, España",
+          "duration": "5 meses",
+          "description": [
+            "Gestión de compras de estilistas, envíos y devoluciones",
+            "Clipping: búsqueda, seguimiento y recopilación de publicaciones de marca",
+            "Gestión de colaboraciones con influencers/celebrities",
+            "Redacción de contenido para redes sociales y notas de prensa",
+            "Asistencia a estilistas en la búsqueda de prendas según el moodboard"
+          ],
+          "skills": ["Estilismo de moda", "Habilidades comunicativas", "Atención al cliente", "Conocimiento de tendencias", "Habilidades informáticas"]
         },
         {
           "company": "Lia Swimwear",
-          "role": "Marketing y Comunicación",
-          "period": "Mayo 2019 - Dic 2019",
+          "role": "Marketing y comunicación",
+          "period": "May 2019 - Dic 2019",
+          "duration": "8 meses",
+          "location": "Barcelona, España"
+        },
+        {
+          "company": "Cristina Tamborero",
+          "role": "Marketing y comunicación de moda de lujo",
+          "period": "Ene 2019 - May 2019",
+          "duration": "5 meses",
           "location": "Barcelona, España"
         },
         {
           "company": "Brandy Melville",
           "role": "Visual Merchandiser",
-          "period": "Mayo 2017 - Dic 2018",
-          "location": "Londres, Reino Unido"
+          "period": "Nov 2015 - Dic 2018",
+          "duration": "3 años 2 meses",
+          "nestedItems": [
+            {
+              "company": "Brandy Melville",
+              "role": "Visual Merchandiser",
+              "period": "May 2017 - Dic 2018",
+              "location": "Londres, Reino Unido",
+              "duration": "1 año 8 meses",
+              "description": [
+                "Maximizar el interés del cliente y niveles de venta mediante la exhibición apropiada de productos",
+                "Responsable de llaves",
+                "Producir planes de diseño para tiendas y mantener estanterías e inventario",
+                "Analizar cada aspecto de los productos más vendidos (por ejemplo, los puntos de precio, colores o estilos más vendidos) y asegurar que alcancen su máximo potencial",
+                "Supervisar e implementar el visual de todas las tiendas Brandy Melville Londres",
+                "Montaje y desmontaje de decoración en escaparates"
+              ],
+              "skills": ["Exhibición de producto", "Resolución de problemas", "Conocimiento de tendencias", "Creatividad", "VM", "Organización", "Conocimiento de producto"]
+            },
+            {
+              "company": "Brandy Melville",
+              "role": "Visual Merchandiser",
+              "period": "Feb 2016 - May 2017",
+              "location": "Barcelona, España",
+              "duration": "1 año 4 meses",
+              "description": [
+                "Maximizar el interés del cliente y niveles de venta mediante la exhibición apropiada de productos",
+                "Responsable de llaves",
+                "Producir planes de diseño para tiendas y mantener estanterías e inventario",
+                "Analizar cada aspecto de los productos más vendidos (por ejemplo, los puntos de precio, colores o estilos más vendidos) y asegurar que alcancen su máximo potencial"
+              ],
+              "skills": ["Exhibición de producto", "Resolución de problemas", "Conocimiento de tendencias", "Creatividad", "VM", "Organización", "Conocimiento de producto"]
+            },
+            {
+              "company": "Brandy Melville",
+              "role": "Dependienta",
+              "period": "Nov 2015 - Feb 2016",
+              "duration": "4 meses",
+              "location": "Barcelona, España",
+              "skills": ["Conocimiento de producto", "Atención al cliente", "Comunicación"]
+            }
+          ]
         }
       ]
     }
   },
   "contact": {
-    "title": "CONTACTAR",
+    "title": "CONTACTA CONMIGO",
     "form": {
       "name": "Nombre",
       "email": "Correo electrónico",
       "message": "Mensaje",
-      "send": "Enviar",
-      "sending": "Enviando..."
+      "send": "¡ENVIAR!",
+      "sending": "ENVIANDO..."
     },
     "toast": {
       "loading": "Enviando mensaje...",

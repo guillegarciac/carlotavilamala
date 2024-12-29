@@ -17,7 +17,7 @@ export default function ExperienceTimeline() {
       {/* Role & Period */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-2">
         <div>
-          <div className="text-sm font-normal">
+          <div className="text-sm font-normal flex items-center">
             {item.role}
             {item.current && (
               <span className="text-[#FF4444] text-sm ml-2">· Current</span>
@@ -60,22 +60,20 @@ export default function ExperienceTimeline() {
   return (
     <div className="relative">
       <div className="space-y-4">
-        {t.raw('timeline').map((experience, index, array) => (
+        {t.raw('timeline').map((experience, index) => (
           <motion.div
             key={`${experience.company || experience.role}-${index}`}
             className="relative pl-8"
             {...fadeInUp}
             transition={{ delay: index * 0.1 }}
           >
-            {/* Timeline line */}
-            {index < array.length - 1 && (
-              <div className="absolute left-[2.5px] top-[10px] w-[1px] h-[calc(100%_+_4px)] bg-black" />
-            )}
-
             {/* Timeline dot */}
-            <div className="absolute left-0 top-2 z-10">
+            <div className="absolute left-0 top-[7px] z-10">
               <div className="w-[6px] h-[6px] rounded-full bg-black" />
             </div>
+
+            {/* Timeline line - now showing for all items */}
+            <div className="absolute left-[2.5px] top-[20px] w-[1px] h-[calc(100%_-_20px)] bg-black" />
 
             {/* Content */}
             <div>

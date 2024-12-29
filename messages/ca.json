@@ -9,8 +9,8 @@
   },
   "about": {
     "title": "BIO",
-    "bio": "M'agrada la moda, és part de la meva vida. La moda és disseny però la moda també és comunicació. Ha d'arribar a tots els públics, per això necessites entendre-la i saber explicar-la. Per això he estudiat gestió d'esdeveniments de moda, protocol, relacions institucionals, comunicació i màrqueting.",
-    "bio2": "Estilista és el meu proper objectiu. He treballat a Londres i Barcelona, dues ciutats que m'han inspirat perquè la moda és a tot arreu. M'agrada crear històries al voltant de la moda, com fan les grans marques creant un storytelling que saben transmetre en els seus shows. Per ara els admiro, el meu somni és arribar a fer-ho jo mateixa algun dia.",
+    "bio": "Estimo la moda, és part de la meva vida. La moda és disseny però la moda també és comunicació. Ha d'arribar a tots els públics, per això necessites entendre-la i saber explicar-la. Per això he estudiat gestió d'esdeveniments de moda, protocol, relacions institucionals, comunicació i màrqueting.",
+    "bio2": "Estilista és el meu proper objectiu. He treballat a Londres i Barcelona, dues ciutats que m'han inspirat perquè la moda és a tot arreu. M'agrada crear històries al voltant de la moda, com fan les grans marques creant storytelling que saben transmetre en els seus shows. Per ara els admiro, el meu somni és arribar a fer-ho jo mateixa algun dia.",
     "clients": {
       "title": "CLIENTS",
       "list": {
@@ -25,13 +25,13 @@
       }
     },
     "expertise": {
-      "title": "EXPERIÈNCIA",
+      "title": "ESPECIALITZACIÓ",
       "list": {
         "events": "Gestió d'Esdeveniments de Moda",
         "protocol": "Protocol i Relacions Institucionals",
         "communication": "Comunicació de Moda",
         "marketing": "Estratègia de Màrqueting",
-        "styling": "Estilisme",
+        "styling": "Estilisme de Moda",
         "storytelling": "Narrativa Visual"
       }
     },
@@ -42,44 +42,117 @@
           "company": "Massimo Dutti",
           "role": "Visual Merchandiser",
           "period": "Maig 2024 - Present",
-          "location": "Barcelona, Catalunya",
-          "current": true
+          "location": "Barcelona, Espanya",
+          "current": true,
+          "duration": "8 mesos"
         },
         {
-          "company": "Autònoma",
           "role": "Estilista de Moda",
-          "period": "Juny 2021 - Maig 2024",
-          "location": "Barcelona, Catalunya"
-        },
-        {
-          "company": "Schön Magazine",
-          "role": "Estilista de Moda",
-          "period": "Set 2020 - Juny 2021",
-          "location": "Barcelona, Catalunya"
+          "type": "Autònoma",
+          "location": "Barcelona, Espanya",
+          "period": "Jun 2021 - Maig 2024",
+          "duration": "3 anys 9 mesos",
+          "nestedItems": [
+            {
+              "company": "Tous",
+              "role": "Estilista E-commerce",
+              "location": "Barcelona, Espanya",
+              "description": [
+                "Creació de looks per a fotos d'e-commerce",
+                "Gestió de producte amb el departament de vendes",
+                "Documentació de resultats per a estilisme/estudi cercant noves oportunitats de venda",
+                "Cerca de noves propostes i tendències online/offline",
+                "Assessorament en actuació de models",
+                "Comunicació entre Producte, Creatiu, VMs, Retoc i Online per assegurar les millors pràctiques"
+              ]
+            },
+            {
+              "company": "Múltiples Editorials, Fashion Films i Campanyes",
+              "role": "Assistent d'Estilisme Freelance",
+              "description": "Editorials, fashion films i campanyes"
+            }
+          ]
         },
         {
           "company": "3Chic Showroom",
           "role": "Assistent de Showroom",
-          "period": "Gener 2021 - Maig 2021",
-          "location": "Barcelona, Catalunya"
+          "period": "Gen 2021 - Maig 2021",
+          "location": "Barcelona, Espanya",
+          "duration": "5 mesos",
+          "description": [
+            "Gestió de compres d'estilistes, enviaments i devolucions",
+            "Clipping: cerca, seguiment i recopilació de publicacions de marca",
+            "Gestió de col·laboracions amb influencers/celebrities",
+            "Redacció de contingut per a xarxes socials i notes de premsa",
+            "Assistència a estilistes en la cerca de peces segons el moodboard"
+          ],
+          "skills": ["Estilisme de moda", "Habilitats comunicatives", "Atenció al client", "Coneixement de tendències", "Habilitats informàtiques"]
         },
         {
           "company": "Lia Swimwear",
-          "role": "Màrqueting i Comunicació",
+          "role": "Màrqueting i comunicació",
           "period": "Maig 2019 - Des 2019",
-          "location": "Barcelona, Catalunya"
+          "duration": "8 mesos",
+          "location": "Barcelona, Espanya"
+        },
+        {
+          "company": "Cristina Tamborero",
+          "role": "Màrqueting i comunicació de moda de luxe",
+          "period": "Gen 2019 - Maig 2019",
+          "duration": "5 mesos",
+          "location": "Barcelona, Espanya"
         },
         {
           "company": "Brandy Melville",
           "role": "Visual Merchandiser",
-          "period": "Maig 2017 - Des 2018",
-          "location": "Londres, Regne Unit"
+          "period": "Nov 2015 - Des 2018",
+          "duration": "3 anys 2 mesos",
+          "nestedItems": [
+            {
+              "company": "Brandy Melville",
+              "role": "Visual Merchandiser",
+              "period": "Maig 2017 - Des 2018",
+              "location": "Londres, Regne Unit",
+              "duration": "1 any 8 mesos",
+              "description": [
+                "Maximitzar l'interès del client i nivells de venda mitjançant l'exhibició apropiada de productes",
+                "Responsable de claus",
+                "Produir plans de disseny per a botigues i mantenir prestatgeries i inventari",
+                "Analitzar cada aspecte dels productes més venuts (per exemple, els punts de preu, colors o estils més venuts) i assegurar que assoleixin el seu màxim potencial",
+                "Supervisar i implementar el visual de totes les botigues Brandy Melville Londres",
+                "Muntatge i desmuntatge de decoració en aparadors"
+              ],
+              "skills": ["Exhibició de producte", "Resolució de problemes", "Coneixement de tendències", "Creativitat", "VM", "Organització", "Coneixement de producte"]
+            },
+            {
+              "company": "Brandy Melville",
+              "role": "Visual Merchandiser",
+              "period": "Feb 2016 - Maig 2017",
+              "location": "Barcelona, Espanya",
+              "duration": "1 any 4 mesos",
+              "description": [
+                "Maximitzar l'interès del client i nivells de venda mitjançant l'exhibició apropiada de productes",
+                "Responsable de claus",
+                "Produir plans de disseny per a botigues i mantenir prestatgeries i inventari",
+                "Analitzar cada aspecte dels productes més venuts (per exemple, els punts de preu, colors o estils més venuts) i assegurar que assoleixin el seu màxim potencial"
+              ],
+              "skills": ["Exhibició de producte", "Resolució de problemes", "Coneixement de tendències", "Creativitat", "VM", "Organització", "Coneixement de producte"]
+            },
+            {
+              "company": "Brandy Melville",
+              "role": "Dependenta",
+              "period": "Nov 2015 - Feb 2016",
+              "duration": "4 mesos",
+              "location": "Barcelona, Espanya",
+              "skills": ["Coneixement de producte", "Atenció al client", "Comunicació"]
+            }
+          ]
         }
       ]
     }
   },
   "contact": {
-    "title": "CONTACTAR",
+    "title": "CONTACTA AMB MI",
     "form": {
       "name": "Nom",
       "email": "Correu electrònic",
