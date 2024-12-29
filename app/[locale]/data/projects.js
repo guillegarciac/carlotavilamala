@@ -9,16 +9,16 @@ export const projects = [
     imageUrl: "/projects/project0.jpg",
     detailImages: projectDetailImages[0],
     hover: {
-      title: "CONTRIBUTOR MAGAZINE",
+      title: "SINDROMS MAGAZINE",
       description: "2024"
     }
   },
   {
     id: 1,
-    imageUrl: "/projects/project1.jpeg",
+    imageUrl: "/projects/project1.jpg",
     detailImages: projectDetailImages[1],
     hover: {
-      title: "FOLC EYEWEAR",
+      title: "KINKFOLK",
       description: "2024"
     }
   },
@@ -27,17 +27,17 @@ export const projects = [
     imageUrl: "/projects/project2.jpg",
     detailImages: projectDetailImages[2],
     hover: {
-      title: "AUTRY USA",
-      description: "2023"
+      title: "CONTRIBUTOR MAGAZINE",
+      description: "2024"
     }
   },
   {
     id: 3,
-    imageUrl: "/projects/project3.jpg",
+    imageUrl: "/projects/project3.jpeg",
     detailImages: projectDetailImages[3],
     hover: {
-      title: "SEIS DEL TRES",
-      description: "2023"
+      title: "FOLC EYEWEAR",
+      description: "2024"
     }
   },
   {
@@ -45,7 +45,7 @@ export const projects = [
     imageUrl: "/projects/project4.jpg",
     detailImages: projectDetailImages[4],
     hover: {
-      title: "SCHON MAGAZINE",
+      title: "AUTRY USA",
       description: "2023"
     }
   },
@@ -54,7 +54,7 @@ export const projects = [
     imageUrl: "/projects/project5.jpg",
     detailImages: projectDetailImages[5],
     hover: {
-      title: "E-COMMERCE TOUS",
+      title: "SEIS DEL TRES",
       description: "2023"
     }
   },
@@ -63,7 +63,7 @@ export const projects = [
     imageUrl: "/projects/project6.jpg",
     detailImages: projectDetailImages[6],
     hover: {
-      title: "AZZARO PARFUMS",
+      title: "SCHON MAGAZINE",
       description: "2023"
     }
   },
@@ -72,25 +72,25 @@ export const projects = [
     imageUrl: "/projects/project7.jpg",
     detailImages: projectDetailImages[7],
     hover: {
-      title: "NIKE X GLAMOUR",
-      description: "2022"
+      title: "E-COMMERCE TOUS",
+      description: "2023"
     }
   },
   {
     id: 8,
-    imageUrl: "/projects/project8.jpeg",
+    imageUrl: "/projects/project8.jpg",
     detailImages: projectDetailImages[8],
     hover: {
-      title: "SAN VALENTIN, TOUS",
-      description: "2022"
+      title: "AZZARO PARFUMS",
+      description: "2023"
     }
   },
   {
     id: 9,
-    imageUrl: "/projects/project9.jpeg",
+    imageUrl: "/projects/project9.jpg",
     detailImages: projectDetailImages[9],
     hover: {
-      title: "WONDERLAND MAGAZINE, SPECIAL PRADA",
+      title: "NIKE X GLAMOUR",
       description: "2022"
     }
   },
@@ -99,17 +99,17 @@ export const projects = [
     imageUrl: "/projects/project10.jpeg",
     detailImages: projectDetailImages[10],
     hover: {
-      title: "LOEWE X STUDIO GHIBLI, MYTHERESA",
-      description: "2021"
+      title: "SAN VALENTIN, TOUS",
+      description: "2022"
     }
   },
   {
     id: 11,
-    imageUrl: "/projects/project11.jpg",
+    imageUrl: "/projects/project11.jpeg",
     detailImages: projectDetailImages[11],
     hover: {
-      title: "MARIE CLAIRE MEXICO, OCTOBER ISSUE",
-      description: "2021"
+      title: "WONDERLAND MAGAZINE, SPECIAL PRADA",
+      description: "2022"
     }
   },
   {
@@ -117,7 +117,7 @@ export const projects = [
     imageUrl: "/projects/project12.jpeg",
     detailImages: projectDetailImages[12],
     hover: {
-      title: "LEVI'S",
+      title: "LOEWE X STUDIO GHIBLI, MYTHERESA",
       description: "2021"
     }
   },
@@ -126,34 +126,34 @@ export const projects = [
     imageUrl: "/projects/project13.jpg",
     detailImages: projectDetailImages[13],
     hover: {
-      title: "HARPER'S BAZAAR MEXICO, AUGUST ISSUE",
+      title: "MARIE CLAIRE MEXICO, OCTOBER ISSUE",
       description: "2021"
     }
   },
   {
     id: 14,
-    imageUrl: "/projects/project14.jpeg",
+    imageUrl: "/projects/project14.jpg",
     detailImages: projectDetailImages[14],
     hover: {
-      title: "MAISONETTE, 'BACK TO SCHOOL'",
+      title: "LEVI'S",
       description: "2021"
     }
   },
   {
     id: 15,
-    imageUrl: "/projects/project15.jpg",
+    imageUrl: "/projects/project15.jpeg",
     detailImages: projectDetailImages[15],
     hover: {
-      title: "BEATRIZ FUREST, SS",
+      title: "HARPER'S BAZAAR MEXICO, AUGUST ISSUE",
       description: "2021"
     }
   },
   {
     id: 16,
-    imageUrl: "/projects/project16.jpg",
+    imageUrl: "/projects/project16.jpeg",
     detailImages: projectDetailImages[16],
     hover: {
-      title: "SPOT CODORNIU USA",
+      title: "MAISONETTE, 'BACK TO SCHOOL'",
       description: "2021"
     }
   },
@@ -162,7 +162,7 @@ export const projects = [
     imageUrl: "/projects/project17.jpg",
     detailImages: projectDetailImages[17],
     hover: {
-      title: "PLAZA KVINNA, AUGUST ISSUE",
+      title: "BEATRIZ FUREST, SS",
       description: "2021"
     }
   },
@@ -171,7 +171,7 @@ export const projects = [
     imageUrl: "/projects/project18.jpg",
     detailImages: projectDetailImages[18],
     hover: {
-      title: "DSCENE, SUMMER ISSUE",
+      title: "SPOT CODORNIU USA",
       description: "2021"
     }
   },
@@ -179,6 +179,24 @@ export const projects = [
     id: 19,
     imageUrl: "/projects/project19.jpg",
     detailImages: projectDetailImages[19],
+    hover: {
+      title: "PLAZA KVINNA, AUGUST ISSUE",
+      description: "2021"
+    }
+  },
+  {
+    id: 20,
+    imageUrl: "/projects/project20.jpg",
+    detailImages: projectDetailImages[20],
+    hover: {
+      title: "DSCENE, SUMMER ISSUE",
+      description: "2021"
+    }
+  },
+  {
+    id: 21,
+    imageUrl: "/projects/project21.jpg",
+    detailImages: projectDetailImages[21],
     hover: {
       title: "EIKO AI, 080 BARCELONA",
       description: "2021"
