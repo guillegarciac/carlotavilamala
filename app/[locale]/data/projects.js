@@ -132,7 +132,7 @@ export const projects = [
   },
   {
     id: 14,
-    imageUrl: "/projects/project14.jpg",
+    imageUrl: "/projects/project14.jpeg",
     detailImages: projectDetailImages[14],
     hover: {
       title: "LEVI'S",
@@ -141,7 +141,7 @@ export const projects = [
   },
   {
     id: 15,
-    imageUrl: "/projects/project15.jpeg",
+    imageUrl: "/projects/project15.jpg",
     detailImages: projectDetailImages[15],
     hover: {
       title: "HARPER'S BAZAAR MEXICO, AUGUST ISSUE",
