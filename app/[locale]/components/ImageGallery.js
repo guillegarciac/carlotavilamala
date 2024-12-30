@@ -888,16 +888,16 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
 
                 {/* Main Project Image */}
                 <div 
-                  className="h-[calc(100vh-80px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden touch-none md:touch-auto relative"
-                  onTouchStart={onTouchStart}
-                  onTouchMove={onTouchMove}
-                  onTouchEnd={onTouchEnd}
+                  className="h-[calc(100vh-120px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden touch-none md:touch-auto relative"
                   style={{ 
                     width: isMobileRef.current ? '100vw' : '100%',
                     left: isMobileRef.current ? '50%' : '0',
                     transform: isMobileRef.current ? 'translateX(-50%)' : 'none',
                     padding: '0 24px',
                   }}
+                  onTouchStart={onTouchStart}
+                  onTouchMove={onTouchMove}
+                  onTouchEnd={onTouchEnd}
                 >
                   <Image
                     src={selectedImage.imageUrl}
