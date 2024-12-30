@@ -24,7 +24,7 @@ export function getAllProjectImages() {
   const projects = {};
   
   // Scan for all project folders (0-19)
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 21; i++) {
     projects[i] = getProjectDetailImages(i);
   }
   
