@@ -888,7 +888,7 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
 
                 {/* Main Project Image */}
                 <div 
-                  className="h-[calc(100vh-120px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden touch-none md:touch-auto relative"
+                  className="h-[calc(100vh-140px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden touch-none md:touch-auto relative"
                   style={{ 
                     width: isMobileRef.current ? '100vw' : '100%',
                     left: isMobileRef.current ? '50%' : '0',
