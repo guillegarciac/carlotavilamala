@@ -37,6 +37,7 @@
     },
     "experience": {
       "title": "EXPERIENCE",
+      "current": "Current",
       "timeline": [
         {
           "company": "Massimo Dutti",

@@ -17,13 +17,13 @@ export default function ExperienceTimeline() {
       {/* Role & Period */}
       <div className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-1 sm:gap-2">
         <div>
-          <div className="text-sm font-normal flex items-center">
+          <div className="text-sm font-normal flex items-center text-primary">
             {item.role}
             {item.current && (
-              <span className="text-[#FF4444] text-sm ml-2">· Current</span>
+              <span className="text-accent text-sm ml-2">· {t('current')}</span>
             )}
           </div>
-          <div className="text-sm text-black/60 leading-none mt-0.5">
+          <div className="text-sm text-secondary leading-none mt-0.5">
             {item.company ? (
               <>
                 {item.company}
@@ -34,7 +34,7 @@ export default function ExperienceTimeline() {
             )}
           </div>
         </div>
-        <div className="text-sm text-black/60 sm:text-right">
+        <div className="text-sm text-secondary sm:text-right">
           <div>{item.period}</div>
           {item.duration && (
             <div className="hidden sm:block text-xs leading-none sm:mt-0.5">
@@ -43,6 +43,7 @@ export default function ExperienceTimeline() {
           )}
         </div>
       </div>
+
     </div>
   );
 
@@ -69,11 +70,11 @@ export default function ExperienceTimeline() {
           >
             {/* Timeline dot */}
             <div className="absolute left-0 top-[7px] z-10">
-              <div className="w-[6px] h-[6px] rounded-full bg-black" />
+              <div className="w-[6px] h-[6px] rounded-full bg-black dark:bg-white" />
             </div>
 
-            {/* Timeline line - now showing for all items */}
-            <div className="absolute left-[2.5px] top-[20px] w-[1px] h-[calc(100%_-_20px)] bg-black" />
+            {/* Timeline line */}
+            <div className="absolute left-[2.5px] top-[20px] w-[1px] h-[calc(100%_-_20px)] bg-black dark:bg-white" />
 
             {/* Content */}
             <div>
