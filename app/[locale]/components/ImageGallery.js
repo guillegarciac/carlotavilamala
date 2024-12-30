@@ -655,7 +655,7 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
     if (!isClient || !isMobileRef.current) return null;
     
     return (
-      <div className="fixed bottom-0 left-0 right-0 bg-primary md:hidden z-[500] py-6 px-4 border-t border-primary/10">
+      <div className="fixed bottom-0 left-0 right-0 bg-primary md:hidden z-[500] py-2 px-4 border-t border-primary/10">
         <button 
           onClick={navigateToNext}
           className="w-full text-left group"
@@ -745,7 +745,9 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
   const [placeholders, setPlaceholders] = useState([]);
 
   const PlaceholderItem = () => (
-    <div className="group relative aspect-[3/4] bg-black/5 dark:bg-white/5 cursor-pointer overflow-hidden"
+    <div 
+      className="group relative aspect-[3/4] bg-black/5 dark:bg-white/5 cursor-pointer overflow-hidden"
+      onClick={handlePlaceholderClick}
     >
       <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
         transition-opacity duration-500 z-10"
@@ -762,6 +764,11 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
       </div>
     </div>
   );
+
+  // Add this function to handle placeholder clicks
+  const handlePlaceholderClick = () => {
+    router.push('/contact');
+  };
 
   return (
     <>
