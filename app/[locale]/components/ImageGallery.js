@@ -15,6 +15,7 @@ import { IoClose } from "react-icons/io5";
 import Footer from "./Footer";
 import { useTheme } from '../context/ThemeContext';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 
 // Define different layout patterns
 const layoutPatterns = [
@@ -151,7 +152,7 @@ const DesktopNavigation = ({ direction, projectTitle }) => {
   );
 };
 
-export default function ImageGallery({ projects }) {
+export default function ImageGallery({ projects, selectedProject, handleProjectClick }) {
   const t = useTranslations("projects");
   const g = useTranslations("gallery");
   const router = useRouter();
@@ -706,10 +707,66 @@ export default function ImageGallery({ projects }) {
     };
   };
 
+  // Function to calculate grid columns based on screen width
+  const getGridColumns = () => {
+    if (typeof window === 'undefined') return 5; // Default for SSR
+    const width = window.innerWidth;
+    if (width >= 1280) return 5;      // xl breakpoint
+    if (width >= 1024) return 4;      // lg breakpoint
+    if (width >= 768) return 3;       // md breakpoint
+    return 1;                         // mobile
+  };
+
+  // Calculate number of placeholder items needed to maintain grid
+  const calculatePlaceholders = (imagesLength, rowSize) => {
+    const totalRows = Math.ceil(imagesLength / rowSize);
+    const idealCount = totalRows * rowSize;
+    return Array(idealCount - imagesLength).fill(null);
+  };
+
+  // Update placeholders when screen size changes
+  useEffect(() => {
+    const updatePlaceholders = () => {
+      const columns = getGridColumns();
+      const newPlaceholders = calculatePlaceholders(projects.length, columns);
+      setPlaceholders(newPlaceholders);
+    };
+
+    // Initial calculation
+    updatePlaceholders();
+
+    // Add event listener for resize
+    window.addEventListener('resize', updatePlaceholders);
+
+    // Cleanup
+    return () => window.removeEventListener('resize', updatePlaceholders);
+  }, [projects.length]);
+
+  const [placeholders, setPlaceholders] = useState([]);
+
+  const PlaceholderItem = () => (
+    <div className="group relative aspect-[3/4] bg-black/5 dark:bg-white/5 cursor-pointer overflow-hidden"
+    >
+      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 
+        transition-opacity duration-500 z-10"
+      />
+      <div className="absolute inset-0 flex flex-col items-center justify-center p-4 opacity-0 
+        group-hover:opacity-100 transition-opacity duration-500 z-10 text-center"
+      >
+        <h3 className="text-sm font-light tracking-[0.2em] text-white uppercase">
+          {t('placeholder.title')}
+        </h3>
+        <p className="text-xs font-light mt-1 text-white/60 tracking-wider">
+          {t('placeholder.description')}
+        </p>
+      </div>
+    </div>
+  );
+
   return (
     <>
       {/* GALLERY GRID */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8 -mt-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 auto-rows-fr">
         {projects.map((project) => (
           <ProjectItem
             key={project.id}
@@ -721,6 +778,9 @@ export default function ImageGallery({ projects }) {
             focusedImage={focusedImage}
             setFocusedImage={setFocusedImage}
           />
+        ))}
+        {placeholders.map((_, index) => (
+          <PlaceholderItem key={`placeholder-${index}`} />
         ))}
       </div>
 

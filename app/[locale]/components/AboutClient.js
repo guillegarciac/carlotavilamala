@@ -52,9 +52,43 @@ export default function AboutClient() {
               </h2>
             </div>
             <div className="mb-12">
-              <ul className="text-xs leading-relaxed font-light">
-                {Object.entries(t.raw('expertise.list')).map(([key, value]) => (
-                  <li key={key}>{value}</li>
+              <ul className="text-[13px] leading-[1.2] font-light flex flex-wrap gap-x-2 gap-y-2 md:max-w-[600px]">
+                {Object.entries(t.raw('expertise.list'))
+                  .sort((a, b) => {
+                    const aLength = a[1].length;
+                    const bLength = b[1].length;
+                    
+                    // Group items by length ranges
+                    const getGroup = (length) => {
+                      if (length <= 12) return 0;
+                      if (length <= 16) return 1;
+                      if (length <= 22) return 2;
+                      if (length <= 28) return 3;
+                      return 4;
+                    };
+                    
+                    const aGroup = getGroup(aLength);
+                    const bGroup = getGroup(bLength);
+                    
+                    if (aGroup !== bGroup) {
+                      if (aGroup === 0) return -1;
+                      if (bGroup === 0) return 1;
+                      if (aGroup === 1) return -1;
+                      if (bGroup === 1) return 1;
+                      return aGroup - bGroup;
+                    }
+                    
+                    return bLength - aLength;
+                  })
+                  .map(([key, value]) => (
+                  <li 
+                    key={key} 
+                    className="px-4 py-[6px] rounded-full border dark:border-accent-dark border-accent-light 
+                    transition-colors duration-200 ease-in-out whitespace-nowrap flex-shrink-0 w-fit
+                    dark:hover:border-accent-dark/70 hover:border-accent-light/70"
+                  >
+                    {value}
+                  </li>
                 ))}
               </ul>
             </div>

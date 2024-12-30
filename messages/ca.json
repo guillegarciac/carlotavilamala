@@ -27,12 +27,27 @@
     "expertise": {
       "title": "ESPECIALITZACIÓ",
       "list": {
-        "events": "Gestió d'Esdeveniments de Moda",
-        "protocol": "Protocol i Relacions Institucionals",
-        "communication": "Comunicació de Moda",
-        "marketing": "Estratègia de Màrqueting",
-        "styling": "Estilisme de Moda",
-        "storytelling": "Narrativa Visual"
+        "1": "Gestió Events",
+        "2": "Protocol",
+        "3": "Comunicació",
+        "4": "Estratègia",
+        "5": "Estilisme",
+        "6": "Visual Merchandising",
+        "7": "E-commerce",
+        "8": "Producte",
+        "9": "Narrativa",
+        "10": "Marca",
+        "11": "Tendències",
+        "12": "Editorial",
+        "13": "Campanyes",
+        "14": "Showroom",
+        "15": "Luxe",
+        "16": "Xarxes",
+        "17": "Fotografia",
+        "18": "Visual Retail",
+        "19": "Desfilades",
+        "20": "Digital",
+        "21": "Events"
       }
     },
     "experience": {
@@ -173,6 +188,10 @@
     "ca": "Català"
   },
   "projects": {
+    "placeholder": {
+      "title": "PROPER PROJECTE",
+      "description": "Per confirmar"
+    },
     "0": {
       "title": "SINDROMS MAGAZINE",
       "description": "2024"

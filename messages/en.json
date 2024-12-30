@@ -27,12 +27,27 @@
     "expertise": {
       "title": "EXPERTISE",
       "list": {
-        "events": "Fashion Events Management",
-        "protocol": "Protocol & Institutional Relations",
-        "communication": "Fashion Communication",
-        "marketing": "Marketing Strategy",
-        "styling": "Fashion Styling",
-        "storytelling": "Visual Storytelling"
+        "1": "Event Management",
+        "2": "Protocol",
+        "3": "Communication",
+        "4": "Strategy",
+        "5": "Styling",
+        "6": "Visual Merchandising",
+        "7": "E-commerce",
+        "8": "Product",
+        "9": "Storytelling",
+        "10": "Brand",
+        "11": "Trends",
+        "12": "Editorial",
+        "13": "Campaigns",
+        "14": "Showroom",
+        "15": "Luxury",
+        "16": "Social Media",
+        "17": "Photography",
+        "18": "Visual Retail",
+        "19": "Shows",
+        "20": "Digital",
+        "21": "Events"
       }
     },
     "experience": {
@@ -177,6 +192,10 @@
     "ca": "Catalan"
   },
   "projects": {
+    "placeholder": {
+      "title": "NEXT PROJECT",
+      "description": "To be confirmed"
+    },
     "0": {
       "title": "SINDROMS MAGAZINE",
       "description": "2024"
