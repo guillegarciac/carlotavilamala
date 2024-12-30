@@ -20,7 +20,7 @@ export default function ExperienceTimeline() {
           <div className="text-sm font-normal flex items-center text-primary">
             {item.role}
             {item.current && (
-              <span className="text-accent text-sm ml-2">· {t('current')}</span>
+              <span className="text-accent text-sm ml-2">·  {t('current')}</span>
             )}
           </div>
           <div className="text-sm text-secondary leading-none mt-0.5">
@@ -70,11 +70,11 @@ export default function ExperienceTimeline() {
           >
             {/* Timeline dot */}
             <div className="absolute left-0 top-[7px] z-10">
-              <div className="w-[6px] h-[6px] rounded-full bg-black dark:bg-white" />
+              <div className="w-[6px] h-[6px] rounded-full bg-accent" />
             </div>
 
             {/* Timeline line */}
-            <div className="absolute left-[2.5px] top-[20px] w-[1px] h-[calc(100%_-_20px)] bg-black dark:bg-white" />
+            <div className="absolute left-[2.5px] top-[20px] w-[1px] h-[calc(100%_-_20px)] bg-black/20 dark:bg-white/20" />
 
             {/* Content */}
             <div>

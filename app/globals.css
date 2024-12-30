@@ -36,4 +36,32 @@ body {
   .nav-link {
     @apply hover:opacity-50 transition-opacity;
   }
+}
+
+/* Light mode selection */
+::selection {
+  background: var(--accent-color);
+  color: white;
+}
+
+::-moz-selection {
+  background: var(--accent-color);
+  color: white;
+}
+
+/* Dark mode selection */
+.dark ::selection {
+  background: var(--accent-color);
+  color: black;
+}
+
+.dark ::-moz-selection {
+  background: var(--accent-color);
+  color: black;
+}
+
+/* For Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) transparent;
 } 
