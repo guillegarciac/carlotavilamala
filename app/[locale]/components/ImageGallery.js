@@ -203,9 +203,18 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
     setHasAutoScrolled(false);
   }, [selectedImage]);
 
-  // Modify the handleScroll function
+  // Add this state near other state declarations
+  const [showNextProject, setShowNextProject] = useState(false);
+
+  // Modify the handleScroll function to detect when user reaches bottom
   const handleScroll = useCallback((e) => {
     const scrollTop = e.target.scrollTop;
+    const scrollHeight = e.target.scrollHeight;
+    const clientHeight = e.target.clientHeight;
+    
+    // Check if we're near the bottom (within 20px)
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 20;
+    setShowNextProject(isNearBottom);
     
     // Only update title on desktop
     if (window.innerWidth >= 768) {
@@ -559,7 +568,7 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
     if (!isClient || !isMobileRef.current) return null;
     
     return (
-      <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] h-52 -mt-36 touch-auto">
+      <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] mt-4">
         <div className="flex flex-col h-full pt-4">
           <div>
             <style>{swiperStyles}</style>
@@ -605,15 +614,6 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                 {t(`${selectedImage.id}.title`)}
               </h3>
               <p className="text-xs font-light mb-2">{t(`${selectedImage.id}.description`)}</p>
-              {/* Only show scroll indicator for projects with detail images */}
-              {!isVisualsSection && selectedImage.detailImages?.length > 0 && showScrollIndicator && (
-                <div className="mt-2">
-                  <IoIosArrowDown 
-                    size={16} 
-                    className="text-primary animate-bounce mx-auto" 
-                  />
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -650,12 +650,16 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
     }
   }, [selectedImage]);
 
-  // Add this new component for the Next Project section
+  // Update the renderNextProjectSection function
   const renderNextProjectSection = () => {
     if (!isClient || !isMobileRef.current) return null;
     
     return (
-      <div className="fixed bottom-0 left-0 right-0 bg-primary md:hidden z-[500] py-2 px-4 border-t border-primary/10">
+      <div 
+        className={`fixed bottom-0 left-0 right-0 bg-primary md:hidden z-[500] py-2 px-4 
+          border-t border-primary/10 transition-transform duration-300
+          ${showNextProject ? 'translate-y-0' : 'translate-y-full'}`}
+      >
         <button 
           onClick={navigateToNext}
           className="w-full text-left group"
@@ -842,10 +846,10 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                 </div>
               </div>
 
-              {/* Main Image Container - adjust flex properties */}
-              <div className={`relative w-full md:w-[800px] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px] 
+              {/* Main Image Container */}
+              <div className="relative w-full md:w-[800px] lg:w-[1000px] xl:w-[1200px] 
                 px-24 md:px-[120px] lg:px-[160px] mx-auto
-                ${isVisualsSection ? 'flex-1 flex flex-col justify-center' : ''}`}
+                flex flex-col items-center"
               >
                 {/* Prev Arrow + Title (Desktop only) */}
                 <div className="fixed left-6 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
@@ -893,11 +897,10 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                   </div>
                 </div>
 
-                {/* Main Image - adjust height for visuals */}
+                {/* Main Image */}
                 <div 
-                  className={`h-[calc(100vh-140px)] md:h-[calc(100vh-165px)] mx-auto 
-                    overflow-hidden touch-none md:touch-auto relative
-                    ${isVisualsSection ? 'md:h-[calc(100vh-200px)]' : ''}`}
+                  className="h-[calc(100vh-200px)] md:h-[calc(100vh-165px)] mx-auto 
+                    overflow-hidden touch-none md:touch-auto relative"
                   style={{ 
                     width: isMobileRef.current ? '100vw' : '100%',
                     left: isMobileRef.current ? '50%' : '0',
@@ -922,6 +925,58 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                     quality={75}
                   />
                 </div>
+
+                {/* Mobile Controls - Centered below image */}
+                {isMobileRef.current && (
+                  <div className="w-full flex flex-col items-center mt-8 md:hidden">
+                    <div className="w-[200px]"> {/* Fixed width container for swiper */}
+                      <style>{swiperStyles}</style>
+                      <Swiper
+                        modules={[Pagination]}
+                        pagination={{
+                          clickable: true,
+                          type: "bullets",
+                          dynamicBullets: true,
+                          dynamicMainBullets: 1,
+                        }}
+                        preventClicksPropagation={true}
+                        preventClicks={true}
+                        allowTouchMove={false}
+                        onSwiper={(swiper) => {
+                          swiperRef.current = swiper;
+                          setTimeout(() => {
+                            const currentIndex = items.findIndex((p) => p.id === selectedImage.id);
+                            swiper.slideTo(currentIndex, 0);
+                          }, 0);
+                        }}
+                        onSlideChange={(swiper) => {
+                          const newIndex = swiper.activeIndex;
+                          setSelectedImage(items[newIndex]);
+                        }}
+                        spaceBetween={50}
+                        slidesPerView={1}
+                        loop={false}
+                        initialSlide={items.findIndex((p) => p.id === selectedImage.id)}
+                        className="h-6 w-full"
+                      >
+                        {items.map((item, index) => (
+                          <SwiperSlide key={item.id}>
+                            <div className="text-center opacity-0 h-full">{index + 1}</div>
+                          </SwiperSlide>
+                        ))}
+                      </Swiper>
+                    </div>
+
+                    <div className="text-center mt-4">
+                      <h3 className="text-sm font-medium tracking-wider mb-2 px-8 whitespace-nowrap">
+                        {t(`${selectedImage.id}.title`)}
+                      </h3>
+                      <p className="text-xs font-light mb-12">
+                        {t(`${selectedImage.id}.description`)}
+                      </p>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* Footer for visuals */}
@@ -976,9 +1031,6 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                 </div>
               )}
 
-              {/* Mobile Controls */}
-              {renderMobileControls()}
-
               {/* Next/Prev Images for Swipe Transition */}
               {Math.abs(swipeProgress) > 0 && (
                 <div className="fixed inset-0 top-0 md:top-[80px] z-[-1]">
@@ -991,23 +1043,34 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                     if (swipeProgress > 0 && isLast) return null;
 
                     return (
-                      <Image
-                        src={getAdjacentProject(swipeProgress > 0 ? "next" : "prev").imageUrl}
-                        alt=""
-                        fill
-                        sizes="100vw"
-                        className="object-cover md:object-contain mx-auto"
-                        style={{
-                          transform: `translateX(${
-                            swipeProgress > 0
-                              ? window.innerWidth - swipeProgress
-                              : -window.innerWidth - swipeProgress
-                          }px)`,
-                          opacity: 1,
+                      <div 
+                        className="h-[calc(100vh-200px)] md:h-[calc(100vh-165px)] mx-auto 
+                          overflow-hidden relative"
+                        style={{ 
+                          width: isMobileRef.current ? '100vw' : '100%',
+                          left: isMobileRef.current ? '50%' : '0',
+                          transform: isMobileRef.current ? 'translateX(-50%)' : 'none',
+                          padding: '0 24px',
                         }}
-                        priority
-                        quality={75}
-                      />
+                      >
+                        <Image
+                          src={getAdjacentProject(swipeProgress > 0 ? "next" : "prev").imageUrl}
+                          alt=""
+                          fill
+                          sizes="100vw"
+                          className="object-cover md:object-contain mx-auto"
+                          style={{
+                            transform: `translateX(${
+                              swipeProgress > 0
+                                ? window.innerWidth - swipeProgress
+                                : -window.innerWidth - swipeProgress
+                            }px)`,
+                            opacity: 1,
+                          }}
+                          priority
+                          quality={75}
+                        />
+                      </div>
                     );
                   })()}
                 </div>
