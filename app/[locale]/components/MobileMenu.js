@@ -71,6 +71,13 @@ export default function MobileMenu({ currentPath }) {
               {t('projects')}
             </Link>
             <Link 
+              href={`/${locale}/visuals`}
+              className={currentPath.includes('/visuals') ? 'text-accent' : 'text-primary'}
+              onClick={(e) => handleNavigation(e, `/${locale}/visuals`)}
+            >
+              {t('visuals')}
+            </Link>
+            <Link 
               href={`/${locale}/about`}
               className={currentPath.includes('/about') ? 'text-accent' : 'text-primary'}
               onClick={(e) => handleNavigation(e, `/${locale}/about`)}

@@ -15,7 +15,8 @@ import { useTheme } from '../context/ThemeContext';
 
 const playfair = Playfair_Display({ 
   subsets: ['latin'],
-  weight: ['400'],
+  weight: ['400', '500'],
+  display: 'swap',
 });
 
 export default function Navigation() {
@@ -25,7 +26,7 @@ export default function Navigation() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [showTitle, setShowTitle] = useState(false);
-  const { isGalleryOpen, galleryTitle, closeGallery } = useGallery();
+  const { isGalleryOpen, galleryTitle, closeGallery, setSelectedImage, setIsGalleryOpen, setGalleryTitle } = useGallery();
   const router = useRouter();
   const { isDarkMode, toggleTheme } = useTheme();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -92,6 +93,22 @@ export default function Navigation() {
     router.push(pathname.replace(`/${locale}`, `/${newLocale}`));
   };
 
+  // Add this function to handle navigation and clear gallery state
+  const handleNavigation = (e, path) => {
+    // Clear gallery state
+    setSelectedImage(null);
+    setIsGalleryOpen(false);
+    setGalleryTitle(null);
+    
+    // Reset body styles
+    document.body.style.overflow = 'unset';
+    document.body.style.position = 'static';
+    document.body.style.width = 'auto';
+
+    // Navigate to the new path
+    router.push(path);
+  };
+
   // Handle mounting state
   useEffect(() => {
     setMounted(true);
@@ -110,7 +127,7 @@ export default function Navigation() {
           ${showTitle && isLoading ? 'translate-y-0 opacity-100 scale-100' : ''}
           ${showTitle && !isLoading ? '-translate-y-24 opacity-0 scale-[0.6]' : ''}`}
         >
-          <span className={`text-2xl md:text-4xl tracking-[0.2em] ${playfair.className} text-center`}>
+          <span className={`${playfair.className} text-2xl md:text-4xl tracking-[0.2em] text-center`}>
             CARLOTA VILAMALA
           </span>
           <span className="hidden md:block text-sm mt-4 tracking-wider font-light text-center">
@@ -148,9 +165,16 @@ export default function Navigation() {
           <Link 
             href={`/${locale}`}
             className={`nav-link ${isHomePage ? 'text-accent' : 'text-primary'}`}
-            onClick={handleProjectsClick}
+            onClick={(e) => handleNavigation(e, `/${locale}`)}
           >
             {t('projects')}
+          </Link>
+          <Link 
+            href={`/${locale}/visuals`}
+            className={`nav-link ${pathname.includes('/visuals') ? 'text-accent' : ''}`}
+            onClick={(e) => handleNavigation(e, `/${locale}/visuals`)}
+          >
+            {t('visuals')}
           </Link>
           <Link 
             href={`/${locale}/about`}

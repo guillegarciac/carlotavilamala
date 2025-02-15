@@ -152,8 +152,8 @@ const DesktopNavigation = ({ direction, projectTitle }) => {
   );
 };
 
-export default function ImageGallery({ projects, selectedProject, handleProjectClick }) {
-  const t = useTranslations("projects");
+export default function ImageGallery({ items, type = 'projects', selectedItem, handleItemClick }) {
+  const t = useTranslations(type);
   const g = useTranslations("gallery");
   const router = useRouter();
   const { selectedImage, setSelectedImage, setIsGalleryOpen, setGalleryTitle } = useGallery();
@@ -341,9 +341,9 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
       setSwipeProgress(progress);
       
       // Show direction hint at boundaries with a minimum threshold
-      const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+      const currentIndex = items.findIndex(p => p.id === selectedImage.id);
       if ((currentIndex === 0 && progress < -20) || 
-          (currentIndex === projects.length - 1 && progress > 20)) {
+          (currentIndex === items.length - 1 && progress > 20)) {
         setShowDirectionHint(currentIndex === 0 ? 'right' : 'left');
       } else {
         setShowDirectionHint(null);
@@ -361,10 +361,10 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
     // Reset progress first to prevent jump
     setSwipeProgress(0);
 
-    const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+    const currentIndex = items.findIndex(p => p.id === selectedImage.id);
     
     // Only navigate if we're not at the boundaries
-    if (isLeftSwipe && currentIndex < projects.length - 1) {
+    if (isLeftSwipe && currentIndex < items.length - 1) {
       navigateToNext();
     }
     if (isRightSwipe && currentIndex > 0) {
@@ -377,10 +377,10 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
   // NAVIGATION FUNCTIONS
   const navigateToNext = useCallback(() => {
     if (!selectedImage) return;
-    const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
+    const currentIndex = items.findIndex((p) => p.id === selectedImage.id);
     if (currentIndex === -1) return;
-    const nextIndex = (currentIndex + 1) % projects.length;
-    setSelectedImage(projects[nextIndex]);
+    const nextIndex = (currentIndex + 1) % items.length;
+    setSelectedImage(items[nextIndex]);
     
     // Scroll to top smoothly
     if (modalRef.current) {
@@ -393,17 +393,17 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
     // Check current scroll position directly
     const isScrolled = modalRef.current?.scrollTop > 100;
     if (window.innerWidth >= 768 && isScrolled) {
-      setGalleryTitle(t(`${projects[nextIndex].id}.title`));
+      setGalleryTitle(t(`${items[nextIndex].id}.title`));
     }
     swiperRef.current?.slideToLoop(nextIndex);
-  }, [selectedImage, projects, t, setGalleryTitle]);
+  }, [selectedImage, items, t, setGalleryTitle]);
 
   const navigateToPrev = useCallback(() => {
     if (!selectedImage) return;
-    const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
+    const currentIndex = items.findIndex((p) => p.id === selectedImage.id);
     if (currentIndex === -1) return;
-    const prevIndex = currentIndex === 0 ? projects.length - 1 : currentIndex - 1;
-    setSelectedImage(projects[prevIndex]);
+    const prevIndex = currentIndex === 0 ? items.length - 1 : currentIndex - 1;
+    setSelectedImage(items[prevIndex]);
     
     // Scroll to top smoothly
     if (modalRef.current) {
@@ -416,10 +416,10 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
     // Check current scroll position directly
     const isScrolled = modalRef.current?.scrollTop > 100;
     if (window.innerWidth >= 768 && isScrolled) {
-      setGalleryTitle(t(`${projects[prevIndex].id}.title`));
+      setGalleryTitle(t(`${items[prevIndex].id}.title`));
     }
     swiperRef.current?.slideToLoop(prevIndex);
-  }, [selectedImage, projects, t, setGalleryTitle]);
+  }, [selectedImage, items, t, setGalleryTitle]);
 
   // HANDLE KEYBOARD EVENTS
   const handleKeyDown = useCallback(
@@ -448,15 +448,15 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
   // GET ADJACENT PROJECT
   const getAdjacentProject = useCallback(
     (direction) => {
-      const currentIndex = projects.findIndex((p) => p.id === selectedImage?.id);
-      if (currentIndex === -1) return projects[0];
+      const currentIndex = items.findIndex((p) => p.id === selectedImage?.id);
+      if (currentIndex === -1) return items[0];
       if (direction === "next") {
-        return projects[(currentIndex + 1) % projects.length];
+        return items[(currentIndex + 1) % items.length];
       } else {
-        return projects[currentIndex === 0 ? projects.length - 1 : currentIndex - 1];
+        return items[currentIndex === 0 ? items.length - 1 : currentIndex - 1];
       }
     },
-    [selectedImage, projects]
+    [selectedImage, items]
   );
 
   // Swiper pagination bullet styles
@@ -506,16 +506,16 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
   const [loadedProjects, setLoadedProjects] = useState(new Set());
 
   // Add this function to handle preloading of detail images
-  const preloadProjectImages = useCallback((project) => {
-    if (!project || loadedProjects.has(project.id)) return;
+  const preloadItemImages = useCallback((item) => {
+    if (!item || loadedProjects.has(item.id)) return;
 
     // Add to loaded projects set
-    setLoadedProjects(prev => new Set([...prev, project.id]));
+    setLoadedProjects(prev => new Set([...prev, item.id]));
 
     // Create an array of all images to preload
     const imagesToPreload = [
-      project.imageUrl,
-      ...(project.detailImages || [])
+      item.imageUrl,
+      ...(item.detailImages || [])
     ];
 
     // Preload images in sequence
@@ -533,17 +533,17 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
   useEffect(() => {
     if (selectedImage) {
       // Preload current project's detail images
-      preloadProjectImages(selectedImage);
+      preloadItemImages(selectedImage);
       
       // Preload next project's detail images
       const nextProject = getAdjacentProject("next");
-      preloadProjectImages(nextProject);
+      preloadItemImages(nextProject);
       
       // Preload previous project's detail images
       const prevProject = getAdjacentProject("prev");
-      preloadProjectImages(prevProject);
+      preloadItemImages(prevProject);
     }
-  }, [selectedImage, getAdjacentProject, preloadProjectImages]);
+  }, [selectedImage, getAdjacentProject, preloadItemImages]);
 
   // Add these state declarations near the other states
   const [showScrollIndicator, setShowScrollIndicator] = useState(true);
@@ -551,15 +551,16 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
 
   const { isDarkMode } = useTheme();
 
-  // Conditionally render mobile-specific elements
+  // Add this function to check if we're in visuals section
+  const isVisualsSection = type === 'visuals';
+
+  // Modify the renderMobileControls function
   const renderMobileControls = () => {
     if (!isClient || !isMobileRef.current) return null;
     
     return (
       <div className="w-screen bg-primary flex flex-col md:hidden relative z-[500] h-52 -mt-36 touch-auto">
-        {/* Dots and Title in one container */}
         <div className="flex flex-col h-full pt-4">
-          {/* Dots at the top */}
           <div>
             <style>{swiperStyles}</style>
             <Swiper
@@ -576,37 +577,36 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
               onSwiper={(swiper) => {
                 swiperRef.current = swiper;
                 setTimeout(() => {
-                  const currentIndex = projects.findIndex((p) => p.id === selectedImage.id);
+                  const currentIndex = items.findIndex((p) => p.id === selectedImage.id);
                   swiper.slideTo(currentIndex, 0);
                 }, 0);
               }}
               onSlideChange={(swiper) => {
                 const newIndex = swiper.activeIndex;
-                setSelectedImage(projects[newIndex]);
+                setSelectedImage(items[newIndex]);
               }}
               spaceBetween={50}
               slidesPerView={1}
               loop={false}
-              initialSlide={projects.findIndex((p) => p.id === selectedImage.id)}
+              initialSlide={items.findIndex((p) => p.id === selectedImage.id)}
               className="h-6 w-full"
             >
-              {projects.map((project, index) => (
-                <SwiperSlide key={project.id}>
+              {items.map((item, index) => (
+                <SwiperSlide key={item.id}>
                   <div className="text-center opacity-0 h-full">{index + 1}</div>
                 </SwiperSlide>
               ))}
             </Swiper>
           </div>
 
-          {/* Title Section */}
           <div className="mt-1">
             <div className="px-4 text-center">
               <h3 className="text-sm font-medium tracking-wider mb-1">
                 {t(`${selectedImage.id}.title`)}
               </h3>
               <p className="text-xs font-light mb-2">{t(`${selectedImage.id}.description`)}</p>
-              {/* Scroll Indicator Arrow */}
-              {selectedImage.detailImages?.length > 0 && showScrollIndicator && (
+              {/* Only show scroll indicator for projects with detail images */}
+              {!isVisualsSection && selectedImage.detailImages?.length > 0 && showScrollIndicator && (
                 <div className="mt-2">
                   <IoIosArrowDown 
                     size={16} 
@@ -728,7 +728,7 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
   useEffect(() => {
     const updatePlaceholders = () => {
       const columns = getGridColumns();
-      const newPlaceholders = calculatePlaceholders(projects.length, columns);
+      const newPlaceholders = calculatePlaceholders(items.length, columns);
       setPlaceholders(newPlaceholders);
     };
 
@@ -740,7 +740,7 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
 
     // Cleanup
     return () => window.removeEventListener('resize', updatePlaceholders);
-  }, [projects.length]);
+  }, [items.length]);
 
   const [placeholders, setPlaceholders] = useState([]);
 
@@ -774,13 +774,13 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
     <>
       {/* GALLERY GRID */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 auto-rows-fr">
-        {projects.map((project) => (
+        {items.map((item) => (
           <ProjectItem
-            key={project.id}
-            project={project}
+            key={item.id}
+            project={item}
             onSelect={setSelectedImage}
             t={t}
-            preloadProjectImages={preloadProjectImages}
+            preloadProjectImages={preloadItemImages}
             projectRefs={projectRefs}
             focusedImage={focusedImage}
             setFocusedImage={setFocusedImage}
@@ -820,12 +820,16 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
 
           <div
             ref={modalRef}
-            className={`fixed inset-0 z-50 bg-primary overflow-y-auto overscroll-none
+            className={`fixed inset-0 z-50 bg-primary 
+              ${isVisualsSection ? 'overflow-hidden' : 'overflow-y-auto overscroll-none'}
               ${isScrolled ? 'md:pt-[105px]' : 'md:pt-6'}
-              transition-all duration-300`}
+              ${isVisualsSection ? 'md:pb-6' : ''}`}
             onScroll={handleScroll}
           >
-            <div className="relative w-full min-h-screen flex flex-col items-center">
+            {/* Main container - increase height for visuals */}
+            <div className={`relative w-full flex flex-col 
+              ${isVisualsSection ? 'h-[calc(100vh-20px)]' : 'min-h-screen'}`}
+            >
               {/* Desktop Info */}
               <div className="hidden md:block w-full text-center -mt-2">
                 <div className="w-full text-center bg-primary/80 py-1.5">
@@ -838,8 +842,11 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
                 </div>
               </div>
 
-              {/* Main Image Container with Navigation Arrows */}
-              <div className="relative w-full md:w-[800px] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px] px-24 md:px-[120px] lg:px-[160px] mx-auto">
+              {/* Main Image Container - adjust flex properties */}
+              <div className={`relative w-full md:w-[800px] lg:w-[1000px] xl:w-[1200px] 2xl:w-[1400px] 
+                px-24 md:px-[120px] lg:px-[160px] mx-auto
+                ${isVisualsSection ? 'flex-1 flex flex-col justify-center' : ''}`}
+              >
                 {/* Prev Arrow + Title (Desktop only) */}
                 <div className="fixed left-6 top-1/2 -translate-y-1/2 hidden md:flex items-center group z-[60] max-w-[250px]">
                   <div className="relative pl-6 cursor-pointer w-full" onClick={navigateToPrev}>
@@ -886,9 +893,11 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
                   </div>
                 </div>
 
-                {/* Main Project Image */}
+                {/* Main Image - adjust height for visuals */}
                 <div 
-                  className="h-[calc(100vh-140px)] md:h-[calc(100vh-105px)] mx-auto overflow-hidden touch-none md:touch-auto relative"
+                  className={`h-[calc(100vh-140px)] md:h-[calc(100vh-165px)] mx-auto 
+                    overflow-hidden touch-none md:touch-auto relative
+                    ${isVisualsSection ? 'md:h-[calc(100vh-200px)]' : ''}`}
                   style={{ 
                     width: isMobileRef.current ? '100vw' : '100%',
                     left: isMobileRef.current ? '50%' : '0',
@@ -915,6 +924,58 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
                 </div>
               </div>
 
+              {/* Footer for visuals */}
+              {isVisualsSection && (
+                <div className="hidden md:block w-full px-8 mt-auto mb-4">
+                  <Footer variant="simple" />
+                </div>
+              )}
+
+              {/* Detail Images Gallery - only for projects */}
+              {!isVisualsSection && selectedImage.detailImages && selectedImage.detailImages.length > 0 && (
+                <div 
+                  ref={detailImagesRef}
+                  className="w-full overflow-y-auto mt-0 md:mt-[80px] bg-primary pb-24 md:pb-12 px-6 md:px-0"
+                >
+                  <div className="relative w-full max-w-[2400px] mx-auto">
+                    <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                      {selectedImage.detailImages.map((imagePath, index) => {
+                        const layoutStyles = getImageLayoutStyle(index, selectedImage.id);
+                        return (
+                          <div 
+                            key={index} 
+                            className="relative w-full aspect-[3/4]"
+                          >
+                            <div className="relative w-full h-full overflow-hidden">
+                              <Image
+                                src={imagePath}
+                                alt={`${t(`${selectedImage.id}.title`)} - Detail ${index + 1}`}
+                                width={2400}
+                                height={1800}
+                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw"
+                                className="w-full h-full object-cover"
+                                style={{
+                                  objectPosition: 'center center'
+                                }}
+                                priority={index < 4}
+                                quality={95}
+                              />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Footer for projects */}
+              {!isVisualsSection && (
+                <div className="hidden md:block w-full px-8">
+                  <Footer variant="simple" />
+                </div>
+              )}
+
               {/* Mobile Controls */}
               {renderMobileControls()}
 
@@ -922,9 +983,9 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
               {Math.abs(swipeProgress) > 0 && (
                 <div className="fixed inset-0 top-0 md:top-[80px] z-[-1]">
                   {(() => {
-                    const currentIndex = projects.findIndex(p => p.id === selectedImage.id);
+                    const currentIndex = items.findIndex(p => p.id === selectedImage.id);
                     const isFirst = currentIndex === 0;
-                    const isLast = currentIndex === projects.length - 1;
+                    const isLast = currentIndex === items.length - 1;
                     
                     if (swipeProgress < 0 && isFirst) return null;
                     if (swipeProgress > 0 && isLast) return null;
@@ -972,49 +1033,6 @@ export default function ImageGallery({ projects, selectedProject, handleProjectC
                   </span>
                 </div>
               )}
-
-              {/* Detail Images Gallery */}
-              {selectedImage.detailImages && selectedImage.detailImages.length > 0 && (
-                <div 
-                  ref={detailImagesRef}
-                  className="w-full overflow-y-auto mt-0 md:mt-[80px] bg-primary pb-24 md:pb-12 px-6 md:px-0"
-                >
-                  <div className="relative w-full max-w-[2400px] mx-auto">
-                    <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
-                      {selectedImage.detailImages.map((imagePath, index) => {
-                        const layoutStyles = getImageLayoutStyle(index, selectedImage.id);
-                        return (
-                          <div 
-                            key={index} 
-                            className="relative w-full aspect-[3/4]"
-                          >
-                            <div className="relative w-full h-full overflow-hidden">
-                              <Image
-                                src={imagePath}
-                                alt={`${t(`${selectedImage.id}.title`)} - Detail ${index + 1}`}
-                                width={2400}
-                                height={1800}
-                                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw"
-                                className="w-full h-full object-cover"
-                                style={{
-                                  objectPosition: 'center center'
-                                }}
-                                priority={index < 4}
-                                quality={95}
-                              />
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Footer */}
-              <div className="hidden md:block w-full px-8">
-                <Footer variant="simple" />
-              </div>
 
               {/* Add the Next Project section to the modal content */}
               {renderNextProjectSection()}

@@ -1,6 +1,7 @@
 {
   "navigation": {
     "projects": "PROJECTS",
+    "visuals": "VISUALS",
     "about": "ABOUT ME",
     "contact": "CONTACT",
     "subtitle": "Fashion Stylist and Creative Direction",
@@ -295,5 +296,72 @@
       "previous": "Swipe left to previous",
       "next": "Swipe right to next"
     }
+  },
+  "visuals": {
+    "placeholder": {
+      "title": "MORE VISUALS",
+      "description": "Coming soon"
+    },
+    "visual1": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual2": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual3": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual4": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual5": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual6": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual7": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual8": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual9": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual10": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual11": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual12": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual13": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual14": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual15": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "next_project": "NEXT VISUAL"
   }
 } 

@@ -1,6 +1,7 @@
 {
   "navigation": {
     "projects": "PROJECTES",
+    "visuals": "VISUALS",
     "about": "SOBRE MI",
     "contact": "CONTACTE",
     "subtitle": "Estilista de Moda i Direcció Creativa",
@@ -291,5 +292,72 @@
       "previous": "Llisca cap a l'esquerra per anar a l'anterior",
       "next": "Llisca cap a la dreta per anar al següent"
     }
+  },
+  "visuals": {
+    "placeholder": {
+      "title": "MÉS VISUALS",
+      "description": "Properament"
+    },
+    "visual1": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual2": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual3": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual4": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual5": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual6": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual7": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual8": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual9": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual10": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual11": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual12": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual13": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual14": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "visual15": {
+      "title": "MASSIMO DUTTI",
+      "description": "2024"
+    },
+    "next_project": "SEGÜENT VISUAL"
   }
 } 

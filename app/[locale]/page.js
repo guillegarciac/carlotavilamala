@@ -12,7 +12,10 @@ export default function Home({ params: { locale } }) {
       <main className="px-8 pt-24 md:pt-20 transition-opacity duration-[800ms] delay-[400ms]
         opacity-0 animate-fadeIn"
       >
-        <ImageGallery projects={projects} />
+        <ImageGallery 
+          items={projects} 
+          type="projects"
+        />
       </main>
     </div>
   );
