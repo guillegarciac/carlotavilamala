@@ -993,7 +993,7 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                   className="w-full overflow-y-auto mt-0 md:mt-[80px] bg-primary pb-24 md:pb-12 px-6 md:px-0"
                 >
                   <div className="relative w-full max-w-[2400px] mx-auto">
-                    <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
+                    <div className="relative grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 pt-8">
                       {selectedImage.detailImages.map((imagePath, index) => {
                         const layoutStyles = getImageLayoutStyle(index, selectedImage.id);
                         return (
