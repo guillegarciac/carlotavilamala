@@ -800,7 +800,28 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
         <>
           {/* Close Button */}
           <button
-            onClick={closeGallery}
+            onClick={(e) => {
+              e.preventDefault();
+              closeGallery();
+              
+              // On mobile, navigate back to landing page
+              if (isMobileRef.current) {
+                // Set navigation flag to prevent splash screen
+                try {
+                  sessionStorage.setItem('isNavigating', 'true');
+                  localStorage.setItem('hasVisitedSite', 'true');
+                } catch (error) {
+                  console.error('Error setting session storage:', error);
+                }
+                
+                // Get the current path to extract locale
+                const pathname = window.location.pathname;
+                const locale = pathname.split('/')[1] || 'en';
+                
+                // Force navigation to landing page
+                window.location.href = `/${locale}`;
+              }
+            }}
             className={`fixed top-4 right-4 z-[100] w-8 h-8 flex items-center justify-center 
               ${isDarkMode 
                 ? 'bg-black hover:bg-black/80' 

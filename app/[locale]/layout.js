@@ -6,7 +6,7 @@ import "../globals.css";
 import Footer from './components/Footer';
 import { GalleryProvider } from './context/GalleryContext';
 import { ThemeProvider } from './context/ThemeContext';
-import SplashScreen from './components/SplashScreen';
+import ClientSplashScreen from './components/ClientSplashScreen';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
@@ -55,7 +55,7 @@ export default async function RootLayout({ children, params: { locale } }) {
         <ThemeProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
             <GalleryProvider>
-              <SplashScreen />
+              <ClientSplashScreen />
               {children}
               <Footer />
             </GalleryProvider>

@@ -191,13 +191,9 @@ export default function Navigation() {
                 document.body.style.position = 'static';
                 document.body.style.width = 'auto';
                 
-                // Set both navigation flags to prevent splash screen
+                // Set navigation flag to prevent splash screen
                 try {
                   sessionStorage.setItem('isNavigating', 'true');
-                  sessionStorage.setItem('hasVisited', 'true');
-                  
-                  // Also set a localStorage flag as backup
-                  localStorage.setItem('hasVisited', 'true');
                 } catch (error) {
                   console.error('Error setting session storage:', error);
                 }
@@ -205,6 +201,8 @@ export default function Navigation() {
                 // Force immediate navigation
                 window.location.href = `/${locale}`;
               } else {
+                // Set navigation flag to prevent splash screen
+                sessionStorage.setItem('isNavigating', 'true');
                 handleNavigation(e, `/${locale}`);
               }
             }}
@@ -214,19 +212,37 @@ export default function Navigation() {
           <Link 
             href={`/${locale}/visuals`}
             className={`nav-link ${pathname.includes('/visuals') ? 'text-accent' : ''}`}
-            onClick={handleVisualsClick}
+            onClick={(e) => {
+              e.preventDefault();
+              
+              // Set navigation flag to prevent splash screen
+              sessionStorage.setItem('isNavigating', 'true');
+              
+              // Then handle visuals click
+              handleVisualsClick(e);
+            }}
           >
             {t('visuals')}
           </Link>
           <Link 
             href={`/${locale}/about`}
             className={`nav-link ${pathname.includes('/about') ? 'text-accent' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              sessionStorage.setItem('isNavigating', 'true');
+              router.push(`/${locale}/about`);
+            }}
           >
             {t('about')}
           </Link>
           <Link 
             href={`/${locale}/contact`}
             className={`nav-link ${pathname.includes('/contact') ? 'text-accent' : ''}`}
+            onClick={(e) => {
+              e.preventDefault();
+              sessionStorage.setItem('isNavigating', 'true');
+              router.push(`/${locale}/contact`);
+            }}
           >
             {t('contact')}
           </Link>
