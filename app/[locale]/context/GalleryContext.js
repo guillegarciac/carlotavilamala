@@ -22,11 +22,6 @@ export function GalleryProvider({ children }) {
       document.body.style.overflow = 'unset';
       document.body.style.position = 'static';
       document.body.style.width = 'auto';
-      
-      // Navigate back to projects page
-      setTimeout(() => {
-        router.push('/');
-      }, 0);
     } catch (error) {
       console.error('Error in closeGallery:', error);
       // Fallback close
@@ -34,7 +29,7 @@ export function GalleryProvider({ children }) {
       setIsGalleryOpen(false);
       setGalleryTitle(null);
     }
-  }, [router]);
+  }, []);
 
   return (
     <GalleryContext.Provider value={{

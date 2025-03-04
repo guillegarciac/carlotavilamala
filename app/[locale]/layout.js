@@ -6,13 +6,14 @@ import "../globals.css";
 import Footer from './components/Footer';
 import { GalleryProvider } from './context/GalleryContext';
 import { ThemeProvider } from './context/ThemeContext';
+import SplashScreen from './components/SplashScreen';
 
 const playfair = Playfair_Display({
   subsets: ['latin'],
   weight: ['400'],
 });
 
-export default async function LocaleLayout({ children, params: { locale } }) {
+export default async function RootLayout({ children, params: { locale } }) {
   unstable_setRequestLocale(locale);
 
   let messages;
@@ -54,6 +55,7 @@ export default async function LocaleLayout({ children, params: { locale } }) {
         <ThemeProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
             <GalleryProvider>
+              <SplashScreen />
               {children}
               <Footer />
             </GalleryProvider>

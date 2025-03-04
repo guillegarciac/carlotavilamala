@@ -8,6 +8,7 @@ import LanguageSelector from "./LanguageSelector";
 import { useTranslations, useLocale } from 'next-intl';
 import { useTheme } from '../context/ThemeContext';
 import { useRouter } from 'next/navigation';
+import { useGallery } from '../context/GalleryContext';
 
 export default function MobileMenu({ currentPath }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,6 +18,7 @@ export default function MobileMenu({ currentPath }) {
   const { isDarkMode, toggleTheme } = useTheme();
   const isHomePage = currentPath === `/${locale}` || currentPath === `/${locale}/`;
   const router = useRouter();
+  const { setSelectedImage, setIsGalleryOpen, setGalleryTitle, isGalleryOpen, closeGallery } = useGallery();
 
   useEffect(() => {
     setMounted(true);
@@ -26,6 +28,17 @@ export default function MobileMenu({ currentPath }) {
     e.preventDefault();
     router.push(path);
     setIsOpen(false);
+  };
+
+  const handleVisualsClick = (e) => {
+    e.preventDefault();
+    setIsOpen(false);
+    
+    router.push(`/${locale}/visuals`);
+    
+    setTimeout(() => {
+      setIsGalleryOpen(true);
+    }, 100);
   };
 
   const bgColor = isDarkMode ? 'bg-white' : 'bg-black';
@@ -66,14 +79,41 @@ export default function MobileMenu({ currentPath }) {
             <Link 
               href={`/${locale}`}
               className={isHomePage ? 'text-accent' : 'text-primary'}
-              onClick={(e) => handleNavigation(e, `/${locale}`)}
+              onClick={(e) => {
+                e.preventDefault();
+                setIsOpen(false);
+                
+                // Always close the gallery when navigating to projects
+                if (isGalleryOpen) {
+                  // Force immediate reset of all gallery state
+                  document.body.style.overflow = 'unset';
+                  document.body.style.position = 'static';
+                  document.body.style.width = 'auto';
+                  
+                  // Set both navigation flags to prevent splash screen
+                  try {
+                    sessionStorage.setItem('isNavigating', 'true');
+                    sessionStorage.setItem('hasVisited', 'true');
+                    
+                    // Also set a localStorage flag as backup
+                    localStorage.setItem('hasVisited', 'true');
+                  } catch (error) {
+                    console.error('Error setting session storage:', error);
+                  }
+                  
+                  // Force immediate navigation
+                  window.location.href = `/${locale}`;
+                } else {
+                  handleNavigation(e, `/${locale}`);
+                }
+              }}
             >
               {t('projects')}
             </Link>
             <Link 
               href={`/${locale}/visuals`}
               className={currentPath.includes('/visuals') ? 'text-accent' : 'text-primary'}
-              onClick={(e) => handleNavigation(e, `/${locale}/visuals`)}
+              onClick={handleVisualsClick}
             >
               {t('visuals')}
             </Link>

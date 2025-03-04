@@ -109,6 +109,22 @@ export default function Navigation() {
     router.push(path);
   };
 
+  // Add this function to handle direct opening of visuals carousel
+  const handleVisualsClick = (e) => {
+    e.preventDefault();
+    
+    // First navigate to the visuals page
+    router.push(`/${locale}/visuals`);
+    
+    // Then use a small timeout to ensure the page loads before opening the carousel
+    setTimeout(() => {
+      // Instead of trying to import the JSON file directly, we'll rely on the
+      // visuals page to handle the data loading and carousel opening
+      // This avoids path resolution issues
+      setIsGalleryOpen(true);
+    }, 100);
+  };
+
   // Handle mounting state
   useEffect(() => {
     setMounted(true);
@@ -165,14 +181,40 @@ export default function Navigation() {
           <Link 
             href={`/${locale}`}
             className={`nav-link ${isHomePage ? 'text-accent' : 'text-primary'}`}
-            onClick={(e) => handleNavigation(e, `/${locale}`)}
+            onClick={(e) => {
+              e.preventDefault();
+              
+              // Always close the gallery when navigating to projects
+              if (isGalleryOpen) {
+                // Force immediate reset of all gallery state
+                document.body.style.overflow = 'unset';
+                document.body.style.position = 'static';
+                document.body.style.width = 'auto';
+                
+                // Set both navigation flags to prevent splash screen
+                try {
+                  sessionStorage.setItem('isNavigating', 'true');
+                  sessionStorage.setItem('hasVisited', 'true');
+                  
+                  // Also set a localStorage flag as backup
+                  localStorage.setItem('hasVisited', 'true');
+                } catch (error) {
+                  console.error('Error setting session storage:', error);
+                }
+                
+                // Force immediate navigation
+                window.location.href = `/${locale}`;
+              } else {
+                handleNavigation(e, `/${locale}`);
+              }
+            }}
           >
             {t('projects')}
           </Link>
           <Link 
             href={`/${locale}/visuals`}
             className={`nav-link ${pathname.includes('/visuals') ? 'text-accent' : ''}`}
-            onClick={(e) => handleNavigation(e, `/${locale}/visuals`)}
+            onClick={handleVisualsClick}
           >
             {t('visuals')}
           </Link>

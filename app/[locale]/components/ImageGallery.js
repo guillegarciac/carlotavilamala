@@ -818,7 +818,13 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
           <div className="fixed z-[100] left-6 top-6 hidden md:block">
             <div className="flex items-center bg-white/80 backdrop-blur-sm rounded-full px-4 py-2">
               <span className="text-lg transform rotate-180 mr-2">←</span>
-              <span className="text-sm tracking-wider">{t(`${selectedImage.id}.title`)}</span>
+              <span className="text-sm tracking-wider">
+                {type === 'visuals' 
+                  ? t(`visual${typeof selectedImage.id === 'string' && selectedImage.id.includes('visual') 
+                      ? selectedImage.id.split('visual')[1] 
+                      : selectedImage.id}.title`) 
+                  : t(`${selectedImage.id}.title`)}
+              </span>
             </div>
           </div>
 
@@ -838,10 +844,18 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
               <div className="hidden md:block w-full text-center -mt-2">
                 <div className="w-full text-center bg-primary/80 py-1.5">
                   <h3 className="text-[11px] md:text-xs font-medium tracking-wider mb-0.5 whitespace-nowrap text-primary">
-                    {t(`${selectedImage.id}.title`)}
+                    {type === 'visuals' 
+                      ? t(`visual${typeof selectedImage.id === 'string' && selectedImage.id.includes('visual') 
+                          ? selectedImage.id.split('visual')[1] 
+                          : selectedImage.id}.title`) 
+                      : t(`${selectedImage.id}.title`)}
                   </h3>
                   <p className="text-[10px] md:text-[11px] font-light whitespace-nowrap text-primary">
-                    {t(`${selectedImage.id}.description`)}
+                    {type === 'visuals' 
+                      ? t(`visual${typeof selectedImage.id === 'string' && selectedImage.id.includes('visual') 
+                          ? selectedImage.id.split('visual')[1] 
+                          : selectedImage.id}.description`) 
+                      : t(`${selectedImage.id}.description`)}
                   </p>
                 </div>
               </div>
@@ -864,10 +878,18 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                       ${isDarkMode ? 'text-white' : 'text-primary'}`}
                     >
                       <h3 className="text-xs font-medium tracking-wider mb-1">
-                        {t(`${getAdjacentProject("prev").id}.title`)}
+                        {type === 'visuals' 
+                          ? t(`visual${typeof getAdjacentProject("prev").id === 'string' && getAdjacentProject("prev").id.includes('visual') 
+                              ? getAdjacentProject("prev").id.split('visual')[1] 
+                              : getAdjacentProject("prev").id}.title`) 
+                          : t(`${getAdjacentProject("prev").id}.title`)}
                       </h3>
                       <p className="text-[11px] font-light">
-                        {t(`${getAdjacentProject("prev").id}.description`)}
+                        {type === 'visuals' 
+                          ? t(`visual${typeof getAdjacentProject("prev").id === 'string' && getAdjacentProject("prev").id.includes('visual') 
+                              ? getAdjacentProject("prev").id.split('visual')[1] 
+                              : getAdjacentProject("prev").id}.description`) 
+                          : t(`${getAdjacentProject("prev").id}.description`)}
                       </p>
                       <span className="text-lg mt-1">←</span>
                     </div>
@@ -887,10 +909,18 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                       ${isDarkMode ? 'text-white' : 'text-primary'}`}
                     >
                       <h3 className="text-xs font-medium tracking-wider mb-1">
-                        {t(`${getAdjacentProject("next").id}.title`)}
+                        {type === 'visuals' 
+                          ? t(`visual${typeof getAdjacentProject("next").id === 'string' && getAdjacentProject("next").id.includes('visual') 
+                              ? getAdjacentProject("next").id.split('visual')[1] 
+                              : getAdjacentProject("next").id}.title`) 
+                          : t(`${getAdjacentProject("next").id}.title`)}
                       </h3>
                       <p className="text-[11px] font-light">
-                        {t(`${getAdjacentProject("next").id}.description`)}
+                        {type === 'visuals' 
+                          ? t(`visual${typeof getAdjacentProject("next").id === 'string' && getAdjacentProject("next").id.includes('visual') 
+                              ? getAdjacentProject("next").id.split('visual')[1] 
+                              : getAdjacentProject("next").id}.description`) 
+                          : t(`${getAdjacentProject("next").id}.description`)}
                       </p>
                       <span className="text-lg mt-1">→</span>
                     </div>
@@ -899,8 +929,9 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
 
                 {/* Main Image */}
                 <div 
-                  className="h-[calc(100vh-200px)] md:h-[calc(100vh-165px)] mx-auto 
-                    overflow-hidden touch-none md:touch-auto relative"
+                  className={`${isVisualsSection 
+                    ? 'h-[calc(100vh-200px)] md:h-[calc(100vh-165px)] mx-auto overflow-hidden touch-none md:touch-auto relative flex items-center justify-center' 
+                    : 'h-[calc(100vh-200px)] md:h-[calc(100vh-165px)] mx-auto overflow-hidden touch-none md:touch-auto relative'}`}
                   style={{ 
                     width: isMobileRef.current ? '100vw' : '100%',
                     left: isMobileRef.current ? '50%' : '0',
@@ -913,10 +944,18 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                 >
                   <Image
                     src={selectedImage.imageUrl}
-                    alt={t(`${selectedImage.id}.title`)}
-                    fill
+                    alt={type === 'visuals' 
+                      ? t(`visual${typeof selectedImage.id === 'string' && selectedImage.id.includes('visual') 
+                          ? selectedImage.id.split('visual')[1] 
+                          : selectedImage.id}.title`) 
+                      : t(`${selectedImage.id}.title`)}
+                    fill={!isVisualsSection}
+                    width={isVisualsSection ? 1200 : undefined}
+                    height={isVisualsSection ? 800 : undefined}
                     sizes="(max-width: 768px) 100vw, 80vw"
-                    className="object-cover md:object-contain mx-auto pointer-events-none md:pointer-events-auto"
+                    className={`${isVisualsSection 
+                      ? 'w-auto h-auto max-h-full max-w-full object-contain pointer-events-none md:pointer-events-auto' 
+                      : 'object-cover md:object-contain mx-auto pointer-events-none md:pointer-events-auto'}`}
                     style={{ 
                       transform: `translateX(${-swipeProgress}px)`,
                       touchAction: 'none',
@@ -1044,8 +1083,9 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
 
                     return (
                       <div 
-                        className="h-[calc(100vh-200px)] md:h-[calc(100vh-165px)] mx-auto 
-                          overflow-hidden relative"
+                        className={`${isVisualsSection 
+                          ? 'h-[calc(100vh-200px)] md:h-[calc(100vh-165px)] mx-auto overflow-hidden relative flex items-center justify-center' 
+                          : 'h-[calc(100vh-200px)] md:h-[calc(100vh-165px)] mx-auto overflow-hidden relative'}`}
                         style={{ 
                           width: isMobileRef.current ? '100vw' : '100%',
                           left: isMobileRef.current ? '50%' : '0',
@@ -1056,9 +1096,13 @@ export default function ImageGallery({ items, type = 'projects', selectedItem, h
                         <Image
                           src={getAdjacentProject(swipeProgress > 0 ? "next" : "prev").imageUrl}
                           alt=""
-                          fill
+                          fill={!isVisualsSection}
+                          width={isVisualsSection ? 1200 : undefined}
+                          height={isVisualsSection ? 800 : undefined}
                           sizes="100vw"
-                          className="object-cover md:object-contain mx-auto"
+                          className={`${isVisualsSection 
+                            ? 'w-auto h-auto max-h-full max-w-full object-contain mx-auto' 
+                            : 'object-cover md:object-contain mx-auto'}`}
                           style={{
                             transform: `translateX(${
                               swipeProgress > 0
